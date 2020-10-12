@@ -1,0 +1,136 @@
+//=============================================================================
+// NukeRocket.
+//
+// Massively powerful nuclear rocket. Will destroy anything in its path.
+// Goes through walls and irradiates people in a HUGE radius.
+//
+// by Nolan "Dark Carnivour" Richert.
+// Copyright(c) 2005 RuneStorm. All Rights Reserved.
+//=============================================================================
+class NukeRocket extends G5Rocket;
+var int		explosions;
+var int		RadiationRadius;
+
+delegate OnDie(Actor Cam);
+
+simulated function Explode(vector HitLocation, vector HitNormal)
+{
+	OnDie(self);
+
+	Infect(HitLocation, HitNormal);
+	Super.Explode(HitLocation, HitNormal);
+	GotoState('Dying');
+}
+
+// Infect the crap out of players
+function Infect(vector HitLocation, vector HitNormal)
+{
+	local NukeRadiationControl F;
+
+	if ( Role == ROLE_Authority )
+	{
+		F = Spawn(class'NukeRadiationControl',self,,HitLocation-HitNormal*2, rot(0,0,0));
+		if (F!=None)
+		{
+			F.Instigator = Instigator;
+			F.Initialize();
+		}
+	}
+
+}
+
+// Do radius damage;
+function BlowUp(vector HitLocation)
+{
+	local Actor A;
+
+	if (Role < ROLE_Authority)
+		return;
+
+	if (DamageRadius > 0)
+		TargetedHurtRadius(Damage, DamageRadius, MyRadiusDamageType, MomentumTransfer, HitLocation, HitActor);
+
+	foreach RadiusActors( class 'Actor', A, RadiationRadius, Location )
+	{
+
+		if (A.bCanBeDamaged)
+		{
+			class'BallisticDamageType'.static.Hurt(A, (1.0-(VSize(A.Location - Location)/RadiationRadius))*150.0, Instigator, A.Location, Normal(A.Location - Location)*500, class'DT_NukePiercingRadius');
+		}
+	}
+
+	MakeNoise(1.0);
+}
+
+
+state Dying
+{
+
+    function BeginState()
+    {
+		bHidden = true;
+		SetPhysics(PHYS_None);
+		SetCollision(false,false,false);
+		Spawn(class'IonCore',,, Location, Rotation);
+    }
+
+   
+Begin:
+    PlaySound(sound'WeaponSounds.redeemer_explosionsound');
+    HurtRadius(Damage, DamageRadius*0.125, MyDamageType, MomentumTransfer, Location);
+    Sleep(0.5);
+    HurtRadius(Damage, DamageRadius*0.300, MyRadiusDamageType, 10000, Location);
+    Sleep(0.2);
+    HurtRadius(Damage, DamageRadius*0.475, MyRadiusDamageType, 10000, Location);
+    Sleep(0.2);
+    HurtRadius(Damage, DamageRadius*0.650, MyRadiusDamageType, 10000, Location);
+    Sleep(1.2);
+    HurtRadius(Damage, DamageRadius*0.825, MyRadiusDamageType, 10000, Location);
+    Sleep(1.2);
+    HurtRadius(Damage, DamageRadius*1.000, MyRadiusDamageType, 10000, Location);
+    Sleep(1.5);
+    HurtRadius(50, DamageRadius*0.475, MyDamageType, 400, Location);
+    Sleep(2.5);
+    HurtRadius(50, DamageRadius*0.475, MyDamageType, 400, Location);
+    Sleep(2.5);
+    HurtRadius(50, DamageRadius*0.475, MyDamageType, 400, Location);
+    Sleep(2.5);
+    HurtRadius(50, DamageRadius*0.475, MyDamageType, 400, Location);
+    Sleep(2.5);
+    HurtRadius(50, DamageRadius*0.475, MyDamageType, 400, Location);
+    Sleep(3.5);
+    HurtRadius(50, DamageRadius*0.475, MyDamageType, 400, Location);
+    Sleep(3.5);
+    HurtRadius(50, DamageRadius*0.475, MyDamageType, 400, Location);
+    Sleep(3.5);
+
+    Destroy();
+}
+
+
+defaultproperties
+{
+     ImpactManager=Class'BWBP_SKC_Fix.IM_LAW'
+     AccelSpeed=50.000000
+     TrailClass=Class'BWBP_SKC_Fix.FLASHRocketTrail'
+     MyRadiusDamageType=Class'BWBP_SKC_Fix.DT_NukeRadius'
+     MotionBlurRadius=3536.000000
+     ShakeRadius=5536.000000
+     MotionBlurFactor=6.000000
+     MotionBlurTime=2.000000
+     ShakeRotMag=(X=576.000000,Y=450.000000,Z=400.000000)
+     ShakeRotRate=(X=7000.000000,Y=7000.000000,Z=5500.000000)
+     ShakeRotTime=8.000000
+     ShakeOffsetMag=(X=40.000000,Y=40.000000,Z=40.000000)
+     ShakeOffsetRate=(X=650.000000,Y=650.000000,Z=650.000000)
+     ShakeOffsetTime=10.000000
+     LifeSpan=35.000000
+     Speed=900.000000
+     MaxSpeed=2000.000000
+     Damage=735.000000
+     DamageRadius=3500.000000
+     RadiationRadius=7000.000000
+     MomentumTransfer=400000.000000
+     MyDamageType=Class'BWBP_SKC_Fix.DT_Nuke'
+     Skins(0)=Texture'BWBP_SKC_Tex.SMAA.SMAARocket'
+}
