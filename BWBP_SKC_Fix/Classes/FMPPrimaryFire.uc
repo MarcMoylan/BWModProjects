@@ -20,6 +20,14 @@ var() class<Actor>				MuzzleFlashClassGreen;	// ALT: The actor to use for this f
 var() Name						AmpFlashBone;
 var() float						AmpFlashScaleFactor;
 
+
+simulated function bool AllowFire()
+{
+	if (level.TimeSeconds < FMPMachinePistol(Weapon).AmplifierSwitchTime)
+		return false;
+	return super.AllowFire();
+}
+
 // Effect related functions ------------------------------------------------
 // Spawn the muzzleflash actor
 function InitEffects()
@@ -154,11 +162,38 @@ simulated function bool ImpactEffect(vector HitLocation, vector HitNormal, Mater
 //Do the spread on the client side
 function PlayFiring()
 {
+
+	if (BW.MagAmmo - ConsumedLoad < 1)
+	{
     	if (FMPMachinePistol(Weapon).bScopeView)
-		FireAnim = 'SightFire';
+		{
+			if (bFlashRed)
+				FireAnim = 'FireClosed';
+			else
+				FireAnim = 'SightFireClosed';
+		}
+		FireAnim = 'FireClosed';
+	}
 	else
+	{
+    	if (FMPMachinePistol(Weapon).bScopeView)
+		{
+			if (bFlashRed)
+				FireAnim = 'Fire';
+			else
+				FireAnim = 'SightFire';
+		}
 		FireAnim = 'Fire';
-	super.PlayFiring();
+	}
+
+	BW.SafePlayAnim(FireAnim, FireAnimRate, TweenTime, ,"FIRE");
+
+    ClientPlayForceFeedback(FireForce);  // jdf
+    FireCount++;
+
+	if (BallisticFireSound.Sound != None)
+		Weapon.PlayOwnedSound(BallisticFireSound.Sound,BallisticFireSound.Slot,BallisticFireSound.Volume,,BallisticFireSound.Radius);
+
 }
 
 defaultproperties

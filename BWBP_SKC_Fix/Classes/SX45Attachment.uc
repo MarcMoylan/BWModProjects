@@ -1,29 +1,35 @@
 //=============================================================================
-// FMP Attachment
-//
-// FMP-2012's 3rd
+// SX45Attachment.
+// TheXavious: Is the AMP our magical "well now this thing can arbitrarily use alternate damage bullets" device?
+// Jiffy: yes
+// Sergeant Kelly: yes
+// TheXavious: yes
 //=============================================================================
-class FMPAttachment extends BallisticAttachment;
+class SX45Attachment extends BallisticCamoHandgunAttachment;
 
-var() class<BCImpactManager>ImpactManagerRed;		//Impact Manager to use for iATLATmpact effects
-var() class<BCImpactManager>ImpactManagerGreen;		//Impact Manager to use for iATLATmpact effects
-var() class<BCTraceEmitter>	TracerClassRed;		//Type of tracer to use for alt fire effects
-var() class<BCTraceEmitter>	TracerClassGreen;		//Type of tracer to use for alt fire effects
-var() class<actor>			MuzzleFlashClassRed;	//Effect to spawn fot mode 0 muzzle flash
-var   actor					MuzzleFlashRed;		//The flash actor itself
-var() class<actor>			MuzzleFlashClassGreen;//Effect to spawn fot mode 1 muzzle flash
-var   actor					MuzzleFlashGreen;		//The flash actor itself
-var bool		bRedAmp;
-var bool		bGreenAmp;
+var bool		bLightsOn, bLightsOnOld;
+var Projector	FlashLightProj;
+var Emitter		FlashLightEmitter;
+
+var() class<BCImpactManager>ImpactManagerAmp1;		
+var() class<BCImpactManager>ImpactManagerAmp2;		
+var() class<BCTraceEmitter>	TracerClassAmp1;		
+var() class<BCTraceEmitter>	TracerClassAmp2;		
+var() class<actor>			MuzzleFlashClassAmp1;	
+var   actor					MuzzleFlashAmp1;		
+var() class<actor>			MuzzleFlashClassAmp2;
+var   actor					MuzzleFlashAmp2;		
+var bool		bAmp1;
+var bool		bAmp2;
 var bool		bAmped;
 var bool		bOldAmped;
 
 replication
 {
-	// Things the server should send to the client.
-	reliable if(Role==ROLE_Authority)
-		bRedAmp, bGreenAmp, bAmped;
+	reliable if ( Role==ROLE_Authority )
+		bLightsOn, bAmp1, bAmp2, bAmped;
 }
+// ============ Amplifier ========================
 
 simulated event PostNetReceive()
 {
@@ -36,6 +42,8 @@ simulated event PostNetReceive()
 			SetBoneScale (0, 0.0, 'Amplifier');
 	}
 	Super.PostNetReceive();
+	if (level.NetMode != NM_Client)
+		return;
 }
 
 function IAOverride(bool bAmped)
@@ -98,12 +106,12 @@ simulated function InstantFireEffects(byte Mode)
 	if (mHitActor == None || (!mHitActor.bWorldGeometry && Mover(mHitActor) == None && Vehicle(mHitActor) == None))
 		return;
 		
-	if (ImpactManager != None && (!bRedAmp && !bGreenAmp))
+	if (ImpactManager != None && (!bAmp1 && !bAmp2))
 		ImpactManager.static.StartSpawn(HitLocation, mHitNormal, mHitSurf, instigator);
-	if (ImpactManagerRed != None && (bRedAmp ))
-		ImpactManagerRed.static.StartSpawn(HitLocation, mHitNormal, mHitSurf, instigator);
-	if (ImpactManagerGreen != None && (bGreenAmp))
-		ImpactManagerGreen.static.StartSpawn(HitLocation, mHitNormal, mHitSurf, instigator);
+	if (ImpactManagerAmp1 != None && bAmp1)
+		ImpactManagerAmp1.static.StartSpawn(HitLocation, mHitNormal, mHitSurf, instigator);
+	if (ImpactManagerAmp2 != None && bAmp2)
+		ImpactManagerAmp2.static.StartSpawn(HitLocation, mHitNormal, mHitSurf, instigator);
 }
 
 // Spawn a tracer and water tracer
@@ -139,22 +147,22 @@ simulated function SpawnTracer(byte Mode, Vector V)
 			bThisShot=true;					}
 	}
 	// Spawn a tracer
-	if (TracerClassRed != None && bThisShot && bRedAmp )
+	if (TracerClassAmp1 != None && bThisShot && bAmp1 )
 	{
 		if (Dist > 200)
-			Tracer = Spawn(TracerClassRed, self, , TipLoc, Rotator(V - TipLoc));
+			Tracer = Spawn(TracerClassAmp1, self, , TipLoc, Rotator(V - TipLoc));
 		if (Tracer != None)
 			Tracer.Initialize(Dist);
 	}
 	// Spawn a tracer
-	if (TracerClassGreen != None && bThisShot && bGreenAmp)
+	if (TracerClassAmp1 != None && bThisShot && bAmp2)
 	{
 		if (Dist > 200)
-			Tracer = Spawn(TracerClassGreen, self, , TipLoc, Rotator(V - TipLoc));
+			Tracer = Spawn(TracerClassAmp2, self, , TipLoc, Rotator(V - TipLoc));
 		if (Tracer != None)
 			Tracer.Initialize(Dist);
 	}
-	else if (TracerClass != None && bThisShot && ((!bRedAmp && !bGreenAmp) || Mode == 0))
+	else if (TracerClass != None && bThisShot && ((!bAmp1 && !bAmp2) || Mode == 0))
 	{
 		if (Dist > 200)
 			Tracer = Spawn(TracerClass, self, , TipLoc, Rotator(V - TipLoc));
@@ -186,18 +194,18 @@ simulated function FlashMuzzleFlash(byte Mode)
 	if (bRandomFlashRoll)
 		R.Roll = Rand(65536);
 
-	if (bRedAmp && MuzzleFlashClassRed != None)
+	if (bAmp2 && MuzzleFlashClassAmp1 != None)
 	{
-		if (MuzzleFlashRed == None)
-			class'BUtil'.static.InitMuzzleFlash (MuzzleFlashRed, MuzzleFlashClassRed, DrawScale*FlashScale, self, AltFlashBone);
-		MuzzleFlashRed.Trigger(self, Instigator);
+		if (MuzzleFlashAmp1 == None)
+			class'BUtil'.static.InitMuzzleFlash (MuzzleFlashAmp1, MuzzleFlashClassAmp1, DrawScale*FlashScale, self, AltFlashBone);
+		MuzzleFlashAmp1.Trigger(self, Instigator);
 		if (bRandomFlashRoll)	SetBoneRotation(AltFlashBone, R, 0, 1.f);
 	}
-	else if (bGreenAmp && MuzzleFlashClassGreen != None)
+	else if (bAmp2 && MuzzleFlashClassAmp2 != None)
 	{
-		if (MuzzleFlashGreen == None)
-			class'BUtil'.static.InitMuzzleFlash (MuzzleFlashGreen, MuzzleFlashClassGreen, DrawScale*FlashScale, self, AltFlashBone);
-		MuzzleFlashGreen.Trigger(self, Instigator);
+		if (MuzzleFlashAmp2 == None)
+			class'BUtil'.static.InitMuzzleFlash (MuzzleFlashAmp2, MuzzleFlashClassAmp2, DrawScale*FlashScale, self, AltFlashBone);
+		MuzzleFlashAmp2.Trigger(self, Instigator);
 		if (bRandomFlashRoll)	SetBoneRotation(AltFlashBone, R, 0, 1.f);
 	}
 	else if (Mode == 0 && MuzzleFlashClass != None)
@@ -209,31 +217,128 @@ simulated function FlashMuzzleFlash(byte Mode)
 	}
 }
 
+// ============ Flash Light ======================
+
+simulated function Hide(bool NewbHidden)
+{
+	super.Hide(NewbHidden);
+	SwitchFlashLight();
+	if (NewbHidden)
+	{
+		KillProjector();
+		if (FlashLightEmitter!=None)
+			FlashLightEmitter.Destroy();
+	}
+	else if (bLightsOn)
+	{
+		SwitchFlashLight();
+	}
+}
+
+simulated function StartProjector()
+{
+	if (FlashLightProj == None)
+		FlashLightProj = Spawn(class'MRS138TorchProjector',self,,location);
+	AttachToBone(FlashLightProj, 'tip2');
+	FlashLightProj.SetRelativeLocation(vect(-32,0,0));
+}
+simulated function KillProjector()
+{
+	if (FlashLightProj != None)
+	{
+		FlashLightProj.Destroy();
+		FlashLightProj = None;
+	}
+}
+
+simulated function SwitchFlashLight ()
+{
+	if (bLightsOn)
+	{
+		if (FlashLightEmitter == None)
+		{
+			FlashLightEmitter = Spawn(class'MRS138TorchEffect',self,,location);
+			class'BallisticEmitter'.static.ScaleEmitter(FlashLightEmitter, DrawScale);
+			AttachToBone(FlashLightEmitter, 'tip2');
+			FlashLightEmitter.bHidden = false;
+			FlashLightEmitter.bCorona = true;
+		}
+		if (!Instigator.IsFirstPerson())
+			StartProjector();
+	}
+	else
+	{
+		FlashLightEmitter.Destroy();
+		KillProjector();
+	}
+}
+
+simulated event Tick(float DT)
+{
+	super.Tick(DT);
+
+	if (Level.NetMode == NM_DedicatedServer)
+		return;
+
+	if (bLightsOn != bLightsOnOld)	
+	{
+		SwitchFlashLight();
+		bLightsOnOld = bLightsOn;	
+	}
+	if (!bLightsOn)
+		return;
+
+	if (Instigator.IsFirstPerson())
+	{
+		KillProjector();
+		if (FlashLightEmitter != None && FlashLightEmitter.bCorona)
+			FlashLightEmitter.bCorona = false;
+	}
+	else
+	{
+		if (FlashLightProj == None)
+			StartProjector();
+		if (FlashLightEmitter != None && !FlashLightEmitter.bCorona)
+			FlashLightEmitter.bCorona = true;
+	}
+}
+
+simulated function Destroyed()
+{
+	if (FlashLightEmitter != None)
+		FlashLightEmitter.Destroy();
+	KillProjector();
+	super.Destroyed();
+}
+
+//===================================================
+
 defaultproperties
 {
-	 TracerMix=0
-	 TracerChance=1
-     AltFlashBone="tip2"
-     MuzzleFlashClassRed=Class'BWBP_SKC_Fix.AH104FlashEmitter'
-     MuzzleFlashClassGreen=Class'BallisticFix.A500FlashEmitter'
-     bAltRapidFire=True
-     bRapidFire=True
-     BrassClass=Class'BallisticFix.Brass_Rifle'
-     DrawScale=0.160000
-     FlashMode=MU_Primary
-     FlyBySound=(Sound=SoundGroup'BallisticSounds2.FlyBys.Bullet-Whizz',Volume=0.700000)
+     MuzzleFlashClassAmp1=Class'BWBP_SKC_Fix.AH104FlashEmitter'
+     MuzzleFlashClassAmp2=Class'BallisticFix.A500FlashEmitter'
+     SlavePivot=(Pitch=0,Roll=32768)
+     RelativeRotation=(Pitch=32768)
+     MuzzleFlashClass=Class'BallisticFix.XK2FlashEmitter'
+     AltMuzzleFlashClass=Class'BallisticFix.XK2SilencedFlash'
      ImpactManager=Class'BallisticFix.IM_Bullet'
-     ImpactManagerRed=Class'BWBP_SKC_Fix.IM_BulletHE'
-     ImpactManagerGreen=Class'BWBP_SKC_Fix.IM_BulletAcid'
+     ImpactManagerAmp1=Class'BWBP_SKC_Fix.IM_BulletHE'
+     ImpactManagerAmp2=Class'BWBP_SKC_Fix.IM_BulletAcid'
+     AltFlashBone="tip2"
+     BrassClass=Class'BallisticFix.Brass_Pistol'
+     BrassMode=MU_Primary
      InstantMode=MU_Primary
-     LightMode=MU_Primary
-     Mesh=SkeletalMesh'BWBP_SKC_AnimExp.TP_MP40'
-     MuzzleFlashClass=Class'BallisticFix.M50FlashEmitter'
-     RelativeLocation=(Z=3)
-     RelativeRotation=(Yaw=32768,Roll=-16384)
-     TracerClass=Class'BWBP_SKC_Fix.TraceEmitter_MARS'
-     TracerClassRed=Class'BWBP_SKC_Fix.TraceEmitter_HMG'
-     TracerClassGreen=Class'BWBP_SKC_Fix.TraceEmitter_Tranq'
+     FlashMode=MU_Primary
+     TracerClass=Class'BallisticFix.TraceEmitter_Default'
+     TracerClassAmp1=Class'BWBP_SKC_Fix.TraceEmitter_HMG'
+     TracerClassAmp2=Class'BWBP_SKC_Fix.TraceEmitter_Tranq'
+     TracerMix=-3
      WaterTracerClass=Class'BallisticFix.TraceEmitter_WaterBullet'
      WaterTracerMode=MU_Primary
+     FlyBySound=(Sound=SoundGroup'BallisticSounds2.FlyBys.Bullet-Whizz',Volume=0.700000)
+     bRapidFire=True
+     bAltRapidFire=True
+     Mesh=SkeletalMesh'BWBP_SKC_Anim.TP_RS04'
+     PrePivot=(Z=-2.000000)
+     DrawScale=0.210000
 }

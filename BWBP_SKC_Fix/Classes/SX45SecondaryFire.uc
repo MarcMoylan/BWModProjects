@@ -1,17 +1,17 @@
 //=============================================================================
-// FMPSecondaryFire.
+// SX45SecondaryFire.
 //
 // Installs the elemental amp on the weapon
 //
 // by Sarge
-// Copyright(c) 2020 Sarge. All rights Sarge.
+// Copyright(c) 2020 Sarge. All rights reserved.
 //=============================================================================
-class FMPSecondaryFire extends BallisticFire;
+class SX45SecondaryFire extends BallisticFire;
 
 event ModeDoFire()
 {
 	if (Weapon.Role == ROLE_Authority)
-		FMPMachinePistol(Weapon).WeaponSpecial();
+		SX45Pistol(Weapon).CommonSwitchAmplifier();
 }
 
 defaultproperties
@@ -20,7 +20,7 @@ defaultproperties
      bWaitForRelease=True
      bModeExclusive=False
      FireRate=0.200000
-     AmmoClass=Class'BallisticFix.Ammo_XRS10Bullets'
+     AmmoClass=Class'BallisticFix.Ammo_45HV'
      AmmoPerFire=0
      BotRefireRate=0.300000
 }

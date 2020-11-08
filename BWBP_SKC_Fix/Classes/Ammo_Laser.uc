@@ -10,8 +10,8 @@ class Ammo_Laser extends BallisticAmmo;
 
 defaultproperties
 {
-     MaxAmmo=100
-     InitialAmount=20
+     MaxAmmo=120
+     InitialAmount=40
      bTryHeadShot=True
      IconFlashMaterial=Shader'BWBP_SKC_Tex.LS14.AmmoIcon_LS14Flash'
      PickupClass=Class'BWBP_SKC_Fix.AP_Laser'

@@ -133,6 +133,7 @@ simulated function BringUp(optional Weapon PrevWeapon)
 	}
 
 }
+//======================================================
 
 // HARDCODED SIGHTING TIME
 simulated function TickSighting (float DT)
@@ -179,7 +180,32 @@ simulated function TickSighting (float DT)
 	}
 }
 
+simulated event AnimEnd (int Channel)
+{
+    local name Anim;
+    local float Frame, Rate;
 
+    GetAnimParams(0, Anim, Frame, Rate);
+
+	if (Anim == 'Pullout' || Anim == 'PulloutFancy' || Anim == 'Fire' || Anim == 'FireClosed' ||Anim == CockAnim || Anim == ReloadAnim)
+	{
+		if (MagAmmo - BFireMode[0].ConsumedLoad < 1)
+		{
+			IdleAnim = 'IdleClosed';
+			PutDownAnim = 'PutawayClosed';
+			SelectAnim = 'PulloutClosed';
+			ReloadAnim = 'ReloadEmpty';
+		}
+		else
+		{
+			IdleAnim = 'Idle';
+			PutDownAnim = 'Putaway';
+			SelectAnim = 'Pullout';
+			ReloadAnim = 'Reload';
+		}
+	}
+	Super.AnimEnd(Channel);
+}
 
 
 simulated function float RateSelf()
@@ -253,6 +279,9 @@ defaultproperties
      AmplifierOffSound=Sound'BWBP3-Sounds.SRS900.SRS-SilencerOff'
      AmplifierPowerOnSound=Sound'BWBP4-Sounds.VPR.VPR-ClipIn'
      AmplifierPowerOffSound=Sound'BWBP4-Sounds.VPR.VPR-ClipOut'
+     CockSelectAnim="PulloutFancy"
+     CockSelectAnimRate=1.000000
+     CockingBringUpTime=1.500000
      TeamSkins(0)=(RedTex=Shader'BallisticWeapons2.Hands.RedHand-Shiny',BlueTex=Shader'BallisticWeapons2.Hands.BlueHand-Shiny')
      AIReloadTime=1.000000
      BigIconMaterial=Texture'BWBP_SKC_TexExp.MP40.BigIcon_MP40'
@@ -270,6 +299,7 @@ defaultproperties
      ClipHitSound=(Sound=Sound'BWBP_SKC_SoundsExp.MP40.MP40-MagIn',Volume=1.500000)
      ClipInFrame=0.650000
      bNeedCock=False
+	 CurrentWeaponMode=0
      WeaponModes(0)=(ModeName="Automatic",ModeID="WM_FullAuto")
      WeaponModes(1)=(ModeName="Amplified: Incendiary",ModeID="WM_FullAuto",bUnavailable=True)
      WeaponModes(2)=(ModeName="Amplified: Corrosive",ModeID="WM_FullAuto",bUnavailable=True)

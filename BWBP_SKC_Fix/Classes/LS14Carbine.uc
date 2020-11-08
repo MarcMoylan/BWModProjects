@@ -15,7 +15,19 @@
 //=============================================================================
 class LS14Carbine extends BallisticWeapon;
 
+//Scripted Ammo Screen Texture
+var() ScriptedTexture WeaponScreen; //Scripted texture to write on
+var() Material	WeaponScreenShader; //Scripted Texture with self illum applied
+var() Material	ScreenBase;
+var() Material	ScreenAmmoBlue; //Norm
+var() Material	ScreenAmmoRed; //Low Ammo
+var() Material	Numbers;
+var protected const color MyFontColor; //Why do I even need this?
 
+var	float	AmmoBarLeftPos;
+var	float	AmmoBarRightPos;
+
+// Heat
 var float		HeatLevel;			// Current Heat level, duh...
 var() Sound		OverHeatSound;		//Sounds for hot firing
 var() Sound		GrenOpenSound;		//Sounds for rocket reloading
@@ -23,6 +35,8 @@ var() Sound		GrenLoadSound;		//
 var() Sound		GrenCloseSound;		//
 var() Sound		DoubleVentSound;	//Sound for double fire's vent
 
+
+// Rockets
 var   actor GLIndicator;
 var() name		GrenadeLoadAnim;	//Anim for rocket reload
 var() name		SingleGrenadeLoadAnim;	//Anim for rocket reload loop
@@ -63,10 +77,107 @@ replication
 	unreliable if( bNetOwner && bNetDirty && (Role==ROLE_Authority) )
 		Rockets;
 	reliable if (Role == ROLE_Authority)
-		ClientSwitchCannonMode;
+		ClientSwitchCannonMode, ClientScreenStart;
 //	unreliable if (Role == Role_Authority)
 //		ClientGrenadePickedUp;
 }
+
+//========================== AMMO COUNTER NON-STATIC TEXTURE ============
+
+simulated function ClientScreenStart()
+{
+	ScreenStart();
+}
+// Called on clients from camera when it gets to postnetbegin
+simulated function ScreenStart()
+{
+	if (Instigator.IsLocallyControlled())
+		WeaponScreen.Client = self;
+	Skins[2] = WeaponScreenShader; //Set up scripted texture.
+	UpdateScreen();//Give it some numbers n shit
+	if (Instigator.IsLocallyControlled())
+		WeaponScreen.Revision++;
+}
+
+simulated event RenderTexture( ScriptedTexture Tex )
+{
+	// 0 is full, 256 is empty
+	AmmoBarLeftPos = 256-(((MagAmmo)/20.0f)*256);
+
+	Tex.DrawTile(0,0,256,256,0,0,256,256,ScreenBase, MyFontColor); //Basic screen
+	if (MagAmmo > 5)
+	{
+		Tex.DrawTile(0,AmmoBarLeftPos,256,256,0,0,256,512,ScreenAmmoBlue, MyFontColor); //Ammo
+		//Tex.DrawTile(-128,AmmoBarRightPos,256,256,0,0,256,256,ScreenAmmoBlue, MyFontColor); //Ammo 2
+	}
+	else
+	{
+		Tex.DrawTile(0,AmmoBarLeftPos,256,256,0,0,256,512,ScreenAmmoRed, MyFontColor); //Ammo
+		//Tex.DrawTile(-128,AmmoBarRightPos,256,256,0,0,256,256,ScreenAmmoRed, MyFontColor); //Ammo 2
+	}
+	
+}
+	
+simulated function UpdateScreen()
+{
+	if (Instigator.IsLocallyControlled())
+	{
+			WeaponScreen.Revision++;
+	}
+}
+	
+// Consume ammo from one of the possible sources depending on various factors
+simulated function bool ConsumeMagAmmo(int Mode, float Load, optional bool bAmountNeededIsMax)
+{
+
+	if (bNoMag || (BFireMode[Mode] != None && BFireMode[Mode].bUseWeaponMag == false))
+		ConsumeAmmo(Mode, Load, bAmountNeededIsMax);
+	else
+	{
+		if (MagAmmo < Load)
+			MagAmmo = 0;
+		else
+			MagAmmo -= Load;
+	}
+
+	//Legacy code for left and right bars, turns out you can't see the right bar
+	/*if (MagAmmo%2 == 1)
+	{
+		AmmoBarLeftPos = 256-(((MagAmmo-1)/20.0f)*256);
+	}
+	else
+	{
+		AmmoBarRightPos = 256-((MagAmmo/20.0f)*256);
+	}*/
+
+	UpdateScreen();
+	return true;
+}
+
+// Animation notify for when the clip is stuck in
+simulated function Notify_ClipIn()
+{
+	local int AmmoNeeded;
+
+	if (ReloadState == RS_None)
+		return;
+	ReloadState = RS_PostClipIn;
+	PlayOwnedSound(ClipInSound.Sound,ClipInSound.Slot,ClipInSound.Volume,ClipInSound.bNoOverride,ClipInSound.Radius,ClipInSound.Pitch,ClipInSound.bAtten);
+	if (level.NetMode != NM_Client)
+	{
+		AmmoNeeded = default.MagAmmo-MagAmmo;
+		if (AmmoNeeded > Ammo[0].AmmoAmount)
+			MagAmmo+=Ammo[0].AmmoAmount;
+		else
+			MagAmmo = default.MagAmmo;
+		Ammo[0].UseAmmo (AmmoNeeded, True);
+	}
+	UpdateScreen();
+}
+
+
+//=====================================================================
+
 
 simulated function BringUp(optional Weapon PrevWeapon)
 {
@@ -77,7 +188,13 @@ simulated function BringUp(optional Weapon PrevWeapon)
 		AimSpread *= 0.5;
 		ChaosAimSpread *= 0.5;
 	}
-
+	else if (Instigator != None && AIController(Instigator.Controller) == None) //Player Screen ON
+	{
+		ScreenStart();
+		if (!Instigator.IsLocallyControlled())
+			ClientScreenStart();
+	}
+	
 //	Core Glow Effect
 	if (CoverGlow != None)
 		CoverGlow.Destroy();
@@ -329,6 +446,10 @@ simulated event RenderOverlays (Canvas Canvas)
 
 	if (!bScopeView)
 	{
+		if (Instigator.IsLocallyControlled())
+		{
+			WeaponScreen.Revision++;
+		}
 		Super(Weapon).RenderOverlays(Canvas);
 		if (SightFX != None)
 			RenderSightFX(Canvas);
@@ -717,6 +838,8 @@ simulated function bool PutDown()
 }
 simulated function Destroyed()
 {
+	if (Instigator != None && AIController(Instigator.Controller) == None)
+		WeaponScreen.client=None;
 	if (BarrelFlare != None)	BarrelFlare.Destroy();
 	if (BarrelFlareSmall != None)	BarrelFlareSmall.Destroy();
 	if (CoverGlow != None)
@@ -946,6 +1069,14 @@ simulated function PlayShovelLoop()
 
 defaultproperties
 {
+	 MyFontColor=(R=255,G=255,B=255,A=255)
+	 Numbers=Texture'BWBP_SKC_TexExp.PUMA.PUMA-Numbers'
+     WeaponScreen=ScriptedTexture'BWBP_SKC_Tex.LS14.LS14-ScriptLCD'
+     WeaponScreenShader=Shader'BWBP_SKC_Tex.LS14.LS14-ScriptLCD-SD'
+	 ScreenBase=Texture'BWBP_SKC_Tex.LS14.LS14-ScreenBase'
+	 ScreenAmmoBlue=Texture'BWBP_SKC_Tex.LS14.LS14-Screen'
+	 ScreenAmmoRed=Texture'BWBP_SKC_Tex.LS14.LS14-ScreenRed'
+	 
      OverHeatSound=Sound'WeaponSounds.BaseImpactAndExplosions.BShieldReflection'
      GrenOpenSound=Sound'BallisticSounds2.M50.M50GrenOpen'
      GrenLoadSound=Sound'BallisticSounds2.M50.M50GrenLoad'
@@ -1044,4 +1175,7 @@ defaultproperties
      LightRadius=5.000000
      Mesh=SkeletalMesh'BWBP_SKC_Anim.LS14Carbine'
      DrawScale=0.300000
+     Skins(0)=Shader'BallisticWeapons2.Hands.Hands-Shiny'
+     Skins(1)=Shader'BWBP_SKC_Tex.LS14.LS14_SD'
+     Skins(2)=Combiner'BWBP_SKC_Tex.M30A2.M30A2-GunScope'
 }

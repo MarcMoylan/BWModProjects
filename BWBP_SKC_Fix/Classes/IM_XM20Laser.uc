@@ -9,6 +9,6 @@ class IM_XM20Laser extends BCImpactManager;
 defaultproperties
 {
      HitEffects(0)=Class'BWBP_SKC_Fix.IE_XM20Impact'
-     HitDecals(0)=Class'BallisticFix.AD_MRLExplosion'
+     HitDecals(0)=Class'BWBP_SKC_Fix.AD_XM20Scorch'
      HitSounds(0)=Sound'BWBP_SKC_Sounds.XM20.XM20-Impact'
 }

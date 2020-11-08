@@ -659,10 +659,12 @@ defaultproperties
      AIReloadTime=1.000000
      AttachmentClass=Class'BWBP_SKC_Fix.M2020GaussAttachment'
      BallisticInventoryGroup=7
-
      BulletBone1="Bullet1"
      BulletBone2="Bullet2"
-
+     CockSelectAnim="PulloutFancy"
+     CockSelectAnimRate=1.000000
+     CockingBringUpTime=2.900000
+	 
      bCockOnEmpty=True
      BCRepClass=Class'BallisticFix.BallisticReplicationInfo'
      bFirstDraw=True
@@ -679,9 +681,9 @@ defaultproperties
      BringUpTime=1.500000
      bShowChargingBar=True
      bWT_Bullet=True
-     ClipHitSound=(Sound=Sound'BWBP_SKC_SoundsExp.M2020.M2020-MagHit',Volume=3.700000)
+     ClipHitSound=(Sound=Sound'BWBP_SKC_SoundsExp.M2020.M2020-MagIn',Volume=3.700000)
      ClipInFrame=0.650000
-     ClipInSound=(Sound=Sound'BWBP_SKC_SoundsExp.M2020.M2020-MagIn',Volume=3.700000)
+     ClipInSound=(Sound=Sound'BWBP_SKC_SoundsExp.M2020.M2020-MagHit',Volume=3.700000)
      ClipOutSound=(Sound=Sound'BWBP_SKC_SoundsExp.M2020.M2020-MagOut',Volume=3.700000)
      CockAnimPostReload="ReloadEndCock"
      CockSound=(Sound=Sound'BWBP_SKC_SoundsExp.M2020.M2020-Cock',Volume=3.700000)
