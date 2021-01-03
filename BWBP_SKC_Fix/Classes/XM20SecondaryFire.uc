@@ -124,6 +124,10 @@ simulated function SwitchLaserMode (byte NewMode)
 			FireLoopAnim=default.FireLoopAnim;
 			FireEndAnim=default.FireEndAnim;
         }
+	if (Weapon.bBerserk)
+		FireRate *= 0.75;
+	if ( Level.GRI.WeaponBerserk > 1.0 )
+	    FireRate /= Level.GRI.WeaponBerserk;
 
         Load=AmmoPerFire;
 }

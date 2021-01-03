@@ -19,8 +19,8 @@ var() class<actor>			MuzzleFlashClassAmp1;
 var   actor					MuzzleFlashAmp1;		
 var() class<actor>			MuzzleFlashClassAmp2;
 var   actor					MuzzleFlashAmp2;		
-var bool		bAmp1;
-var bool		bAmp2;
+var bool		bAmp1; //Cryo
+var bool		bAmp2; //Rad
 var bool		bAmped;
 var bool		bOldAmped;
 
@@ -53,8 +53,6 @@ function IAOverride(bool bAmped)
 	else
 		SetBoneScale (0, 0.0, 'Amplifier');
 }
-
-
 
 // Does all the effects for an instant-hit kind of fire.
 // On the client, this uses mHitLocation to find all the other info needed.
@@ -194,7 +192,7 @@ simulated function FlashMuzzleFlash(byte Mode)
 	if (bRandomFlashRoll)
 		R.Roll = Rand(65536);
 
-	if (bAmp2 && MuzzleFlashClassAmp1 != None)
+	if (bAmp1 && MuzzleFlashClassAmp1 != None)
 	{
 		if (MuzzleFlashAmp1 == None)
 			class'BUtil'.static.InitMuzzleFlash (MuzzleFlashAmp1, MuzzleFlashClassAmp1, DrawScale*FlashScale, self, AltFlashBone);
@@ -315,24 +313,24 @@ simulated function Destroyed()
 
 defaultproperties
 {
-     MuzzleFlashClassAmp1=Class'BWBP_SKC_Fix.AH104FlashEmitter'
-     MuzzleFlashClassAmp2=Class'BallisticFix.A500FlashEmitter'
+     MuzzleFlashClassAmp1=Class'BWBP_SKC_Fix.SX45CryoFlash'
+     MuzzleFlashClassAmp2=Class'BWBP_SKC_Fix.SX45RadMuzzleFlash'
      SlavePivot=(Pitch=0,Roll=32768)
      RelativeRotation=(Pitch=32768)
      MuzzleFlashClass=Class'BallisticFix.XK2FlashEmitter'
      AltMuzzleFlashClass=Class'BallisticFix.XK2SilencedFlash'
      ImpactManager=Class'BallisticFix.IM_Bullet'
-     ImpactManagerAmp1=Class'BWBP_SKC_Fix.IM_BulletHE'
-     ImpactManagerAmp2=Class'BWBP_SKC_Fix.IM_BulletAcid'
+     ImpactManagerAmp1=Class'BWBP_SKC_Fix.IM_BulletFrostHE'
+     ImpactManagerAmp2=Class'BWBP_SKC_Fix.IM_BulletRad'
      AltFlashBone="tip2"
      BrassClass=Class'BallisticFix.Brass_Pistol'
      BrassMode=MU_Primary
      InstantMode=MU_Primary
      FlashMode=MU_Primary
      TracerClass=Class'BallisticFix.TraceEmitter_Default'
-     TracerClassAmp1=Class'BWBP_SKC_Fix.TraceEmitter_HMG'
-     TracerClassAmp2=Class'BWBP_SKC_Fix.TraceEmitter_Tranq'
-     TracerMix=-3
+     TracerClassAmp1=Class'BWBP_SKC_Fix.TraceEmitter_FreezeBig'
+     TracerClassAmp2=Class'BWBP_SKC_Fix.TraceEmitter_HMG'
+     TracerMix=0
      WaterTracerClass=Class'BallisticFix.TraceEmitter_WaterBullet'
      WaterTracerMode=MU_Primary
      FlyBySound=(Sound=SoundGroup'BallisticSounds2.FlyBys.Bullet-Whizz',Volume=0.700000)

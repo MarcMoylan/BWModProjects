@@ -680,7 +680,7 @@ defaultproperties
      RecoilYawFactor=0.800000
      RecoilPitchFactor=1.000000
      RecoilXFactor=0.200000
-     RecoilYFactor=0.600000
+     RecoilYFactor=0.200000
      RecoilDeclineDelay=0.150000
      RecoilDeclineTime=1.7
      ChaosDeclineTime=1.0

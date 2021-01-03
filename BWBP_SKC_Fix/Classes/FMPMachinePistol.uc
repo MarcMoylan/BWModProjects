@@ -125,13 +125,6 @@ simulated function BringUp(optional Weapon PrevWeapon)
 		SetBoneScale (2, 1.0, AmplifierBone2);	
 	}
 
-	if (Instigator != None && AIController(Instigator.Controller) != None)
-	{
-		AimSpread *= 0.4;
-		ChaosAimSpread *= 0.4;
-		RecoilMax *= 0.4;
-	}
-
 }
 //======================================================
 

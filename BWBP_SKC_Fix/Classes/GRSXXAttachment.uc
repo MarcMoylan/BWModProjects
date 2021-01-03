@@ -149,11 +149,11 @@ simulated function InstantFireEffects(byte Mode)
 
 defaultproperties
 {
-     MuzzleFlashClass=Class'BallisticFix.XK2FlashEmitter'
+     MuzzleFlashClass=Class'BWBP_SKC_Fix.GRSXXFlashEmitter'
      ImpactManager=Class'BallisticFix.IM_Bullet'
      BrassClass=Class'BallisticFix.Brass_GRSNine'
      InstantMode=MU_Both
-     TracerClass=Class'BallisticFix.TraceEmitter_Pistol'
+     TracerClass=Class'BallisticFix.TraceEmitter_FiftyNine'
      TracerChance=0.600000
      WaterTracerClass=Class'BallisticFix.TraceEmitter_WaterBullet'
      WaterTracerMode=MU_Both

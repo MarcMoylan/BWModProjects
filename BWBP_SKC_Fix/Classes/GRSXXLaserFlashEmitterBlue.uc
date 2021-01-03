@@ -1,10 +1,10 @@
 //=============================================================================
-// GRSXXLaserFlashEmitter.
+// GRSXXLaserFlashEmitterBlue.
 //
-// by PURPLE
+// by Blue
 // Copyright(c) 2007 RuneStorm. All Rights Reserved.
 //=============================================================================
-class GRSXXLaserFlashEmitter extends BallisticEmitter;
+class GRSXXLaserFlashEmitterBlue extends BallisticEmitter;
 
 defaultproperties
 {
@@ -17,9 +17,9 @@ defaultproperties
          AutomaticInitialSpawning=False
          TriggerDisabled=False
          ColorScale(0)=(Color=(B=255,G=255,R=255,A=255))
-         ColorScale(1)=(RelativeTime=0.260714,Color=(B=255,R=178,A=255))
+         ColorScale(1)=(RelativeTime=0.260714,Color=(B=255,A=255))
          ColorScale(2)=(RelativeTime=1.000000,Color=(A=255))
-         ColorMultiplierRange=(Y=(Min=0.300000,Max=0.300000))
+         ColorMultiplierRange=(X=(Min=0.000000,Max=0.000000),Y=(Min=0.300000,Max=0.300000))
          FadeOutStartTime=0.056000
          FadeInEndTime=0.004000
          CoordinateSystem=PTCS_Relative
@@ -32,7 +32,7 @@ defaultproperties
          SpawnOnTriggerRange=(Min=1.000000,Max=1.000000)
          SpawnOnTriggerPPS=500000.000000
      End Object
-     Emitters(0)=SpriteEmitter'BWBP_SKC_Fix.GRSXXLaserFlashEmitter.SpriteEmitter9'
+     Emitters(0)=SpriteEmitter'BWBP_SKC_Fix.GRSXXLaserFlashEmitterBlue.SpriteEmitter9'
 
      Begin Object Class=SpriteEmitter Name=SpriteEmitter10
          UseDirectionAs=PTDU_Up
@@ -43,9 +43,9 @@ defaultproperties
          AutomaticInitialSpawning=False
          TriggerDisabled=False
          ColorScale(0)=(Color=(B=255,G=192,R=192,A=255))
-         ColorScale(1)=(RelativeTime=0.332143,Color=(B=255,R=255,A=255))
-         ColorScale(2)=(RelativeTime=1.000000,Color=(B=255,R=135,A=255))
-         ColorMultiplierRange=(Y=(Min=0.300000,Max=0.300000))
+         ColorScale(1)=(RelativeTime=0.332143,Color=(B=255,A=255))
+         ColorScale(2)=(RelativeTime=1.000000,Color=(B=255,A=255))
+         ColorMultiplierRange=(X=(Min=0.000000,Max=0.000000),Y=(Min=0.300000,Max=0.300000))
          Opacity=0.460000
          FadeOutStartTime=0.147000
          FadeInEndTime=0.045000
@@ -60,7 +60,7 @@ defaultproperties
          SpawnOnTriggerPPS=500000.000000
          StartVelocityRange=(X=(Min=10.000000,Max=10.000000))
      End Object
-     Emitters(1)=SpriteEmitter'BWBP_SKC_Fix.GRSXXLaserFlashEmitter.SpriteEmitter10'
+     Emitters(1)=SpriteEmitter'BWBP_SKC_Fix.GRSXXLaserFlashEmitterBlue.SpriteEmitter10'
 
      bNoDelete=False
 }

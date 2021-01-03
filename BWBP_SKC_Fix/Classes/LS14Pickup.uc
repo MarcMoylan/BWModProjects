@@ -23,7 +23,7 @@ defaultproperties
      LowPolyStaticMesh=StaticMesh'BWBP_SKC_Static.LaserCarbine.LaserCarbinePickup'
      InventoryType=Class'BWBP_SKC_Fix.LS14Carbine'
      RespawnTime=20.000000
-     PickupMessage="You picked up the LS-14 Laser Carbine"
+     PickupMessage="You picked up the LS-14 Laser Rifle"
      PickupSound=Sound'BWBP_SKC_Sounds.LS14.Gauss-Pickup'
      StaticMesh=StaticMesh'BWBP_SKC_Static.LaserCarbine.LaserCarbinePickup'
      Physics=PHYS_None

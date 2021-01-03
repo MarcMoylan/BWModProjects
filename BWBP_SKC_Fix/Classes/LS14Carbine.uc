@@ -21,7 +21,6 @@ var() Material	WeaponScreenShader; //Scripted Texture with self illum applied
 var() Material	ScreenBase;
 var() Material	ScreenAmmoBlue; //Norm
 var() Material	ScreenAmmoRed; //Low Ammo
-var() Material	Numbers;
 var protected const color MyFontColor; //Why do I even need this?
 
 var	float	AmmoBarLeftPos;
@@ -183,12 +182,7 @@ simulated function BringUp(optional Weapon PrevWeapon)
 {
 	Super.BringUp(PrevWeapon);
 
-	if (Instigator != None && AIController(Instigator.Controller) != None)
-	{
-		AimSpread *= 0.5;
-		ChaosAimSpread *= 0.5;
-	}
-	else if (Instigator != None && AIController(Instigator.Controller) == None) //Player Screen ON
+	if (Instigator != None && AIController(Instigator.Controller) == None) //Player Screen ON
 	{
 		ScreenStart();
 		if (!Instigator.IsLocallyControlled())
@@ -1070,7 +1064,6 @@ simulated function PlayShovelLoop()
 defaultproperties
 {
 	 MyFontColor=(R=255,G=255,B=255,A=255)
-	 Numbers=Texture'BWBP_SKC_TexExp.PUMA.PUMA-Numbers'
      WeaponScreen=ScriptedTexture'BWBP_SKC_Tex.LS14.LS14-ScriptLCD'
      WeaponScreenShader=Shader'BWBP_SKC_Tex.LS14.LS14-ScriptLCD-SD'
 	 ScreenBase=Texture'BWBP_SKC_Tex.LS14.LS14-ScreenBase'
@@ -1156,7 +1149,7 @@ defaultproperties
      CurrentRating=0.600000
      bSniping=True
      bShowChargingBar=True
-     Description="LS-14 Directed Energy Projection Weapon||Manufacturer: UTC Defense Tech|Primary: Focused Photon Beam|Secondary: Mini Rockets||The LS-14 Laser Carbine is UTC Defense Tech's latest energy based assault weapon. The LS-14 features a computer control system which allows the weapon to moderate both primary and secondary functions, and has an easy to read screen that can tell the user the status of its various systems. Ammunition counts, heat levels, and many other useful bits of information are simply a touch of a button away - a feature praised by many soldiers. This laser carbine features a magazine style battery, a side mounted mini rocket launcher, and a scope, making this weapon incredibly versatile. ||Unlike other directed energy weapons, the LS14 comes with a multitude of integrated safety features that prevent it from critically overloading, however these can be disabled if the user wishes. It is important to note that while the LS-14 is primarily a recoilless laser weapon, it is known to expel excess gas at higher temperatures which can make aiming difficult."
+     Description="LS-14 Directed Energy Projection Weapon||Manufacturer: UTC Defense Tech|Primary: Focused Photon Beam|Secondary: Mini Rockets||The LS-14 Laser Rifle was UTC Defense Tech's premier pre-war laser weapon system. The LS-14 featured a computer control system which allowed the weapon to moderate both primary and secondary functions, and had an easy to read screen that told the user the status of its various systems. Ammunition counts, heat levels, and many other useful bits of information were simply a touch of a button away - a feature praised by many soldiers. This laser rifle features a magazine style battery, a side mounted mini rocket launcher, and a scope, making this weapon incredibly versatile. ||Unlike other directed energy weapons, the LS14 came with a multitude of integrated safety features that prevented it from critically overloading, however these could be disabled in the field. It is important to note that while the LS-14 is primarily a recoilless laser weapon, it is known to expel excess gas at higher temperatures which can make aiming difficult."
      Priority=194
      CustomCrossHairTextureName="Crosshairs.HUD.Crosshair_Cross1"
      InventoryGroup=9
@@ -1166,7 +1159,7 @@ defaultproperties
      AttachmentClass=Class'BWBP_SKC_Fix.LS14Attachment'
      IconMaterial=Texture'BWBP_SKC_Tex.LS14.SmallIcon_LS14'
      IconCoords=(X2=127,Y2=31)
-     ItemName="LS-14 Laser Carbine"
+     ItemName="LS-14 Laser Rifle"
      LightType=LT_Pulse
      LightEffect=LE_NonIncidence
      LightHue=30

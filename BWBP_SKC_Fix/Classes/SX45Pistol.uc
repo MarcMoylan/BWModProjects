@@ -27,7 +27,6 @@ var() Sound		TorchOffSound;
 
 var   bool		bAmped;				// ARE YOU AMPED? BECAUSE THIS GUN IS!
 var() name		AmplifierBone;			// Bone to use for hiding cool shit
-var() name		AmplifierBone2;			// Xav likes to make my life difficult
 var() name		AmplifierOnAnim;			//
 var() name		AmplifierOffAnim;		//
 var() sound		AmplifierOnSound;		// 
@@ -90,18 +89,16 @@ simulated function SwitchAmplifier(bool bNewValue)
 	else
 		PlayAnim(AmplifierOffAnim);
 }
-simulated function Notify_SilencerOn()	{	PlaySound(AmplifierOnSound,,0.5);	}
-simulated function Notify_SilencerOff()	{	PlaySound(AmplifierOffSound,,0.5);	}
+simulated function Notify_AmplifierOn()	{	PlaySound(AmplifierOnSound,,0.5);	}
+simulated function Notify_AmplifierOff()	{	PlaySound(AmplifierOffSound,,0.5);	}
 
-simulated function Notify_SilencerShow()
+simulated function Notify_AmplifierShow()
 {	
-	SetBoneScale (0, 1.0, AmplifierBone);	
-	SetBoneScale (2, 0.0, AmplifierBone2);	
+	SetBoneScale (0, 1.0, AmplifierBone);		
 }
-simulated function Notify_SilencerHide()
+simulated function Notify_AmplifierHide()
 {	
 	SetBoneScale (0, 0.0, AmplifierBone);	
-	SetBoneScale (2, 1.0, AmplifierBone2);	
 }
 simulated function Notify_ClipOutOfSight()
 {
@@ -122,10 +119,12 @@ simulated function ClientSwitchWeaponMode (byte newMode)
 	if (newMode == 1)
 	{
 		Skins[6]=CamoMaterials[1];
+		Skins[7]=CamoMaterials[3];
 	}
 	else if (newMode == 2)
 	{
 		Skins[6]=CamoMaterials[0];
+		Skins[7]=CamoMaterials[2];
 	}
 }
 
@@ -142,19 +141,10 @@ simulated function BringUp(optional Weapon PrevWeapon)
 	if (bAmped)
 	{
 		SetBoneScale (0, 1.0, AmplifierBone);
-		SetBoneScale (2, 0.0, AmplifierBone2);
 	}		
 	else
 	{
 		SetBoneScale (0, 0.0, AmplifierBone);
-		SetBoneScale (2, 1.0, AmplifierBone2);	
-	}
-
-	if (Instigator != None && AIController(Instigator.Controller) != None)
-	{
-		AimSpread *= 0.4;
-		ChaosAimSpread *= 0.4;
-		RecoilMax *= 0.4;
 	}
 	
 }
@@ -187,14 +177,14 @@ exec simulated function WeaponSpecial(optional byte i)
 function ServerFlashLight (bool bNew)
 {
 	bLightsOn = bNew;
-	RS04Attachment(ThirdPersonActor).bLightsOn = bLightsOn;
+	SX45Attachment(ThirdPersonActor).bLightsOn = bLightsOn;
 }
 
 simulated function StartProjector()
 {
 	if (FlashLightProj == None)
 		FlashLightProj = Spawn(class'MRS138TorchProjector',self,,location);
-	AttachToBone(FlashLightProj, 'tip2');
+	AttachToBone(FlashLightProj, 'tip3');
 	FlashLightProj.SetRelativeLocation(TorchOffset);
 }
 simulated function KillProjector()
@@ -222,8 +212,8 @@ simulated event RenderOverlays( Canvas Canvas )
 	super.RenderOverlays(Canvas);
 	if (bLightsOn)
 	{
-		TazLoc = GetBoneCoords('tip2').Origin;
-		TazRot = GetBoneRotation('tip2');
+		TazLoc = GetBoneCoords('tip3').Origin;
+		TazRot = GetBoneRotation('tip3');
 		if (FlashLightEmitter != None)
 		{
 			FlashLightEmitter.SetLocation(TazLoc);
@@ -585,12 +575,13 @@ static function class<Pickup> RecommendAmmoPickup(int Mode)
 
 defaultproperties
 {
-     CamoMaterials[0]=Shader'BWBP_SKC_TexExp.Amp.Amp-FinalCyan'
-     CamoMaterials[1]=Shader'BWBP_SKC_TexExp.Amp.Amp-FinalYellow'
-     AmplifierBone="Amplifier"
-     AmplifierBone2="Amplifier2"
-     AmplifierOnAnim="AmplifierOn"
-     AmplifierOffAnim="AmplifierOff"
+     CamoMaterials[0]=Shader'BWBP_SKC_TexExp.Amp.Amp-FinalYellow'
+     CamoMaterials[1]=Shader'BWBP_SKC_TexExp.Amp.Amp-FinalCyan'
+     CamoMaterials[2]=Shader'BWBP_SKC_TexExp.Amp.Amp-GlowYellowShader'
+     CamoMaterials[3]=Shader'BWBP_SKC_TexExp.Amp.Amp-GlowCyanShader'
+     AmplifierBone="Amp"
+     AmplifierOnAnim="AMPAdd"
+     AmplifierOffAnim="AMPRemove"
      AmplifierOnSound=Sound'BWBP3-Sounds.SRS900.SRS-SilencerOn'
      AmplifierOffSound=Sound'BWBP3-Sounds.SRS900.SRS-SilencerOff'
      AmplifierPowerOnSound=Sound'BWBP4-Sounds.VPR.VPR-ClipIn'
@@ -623,7 +614,7 @@ defaultproperties
 		CrosshairInfo=(SpreadRatios=(Y1=0.800000,Y2=1.000000),MaxScale=6.000000)
 		CurrentWeaponMode=0
 		CustomCrossHairTextureName="Crosshairs.HUD.Crosshair_Cross1"
-		Description="SX-45K Tactical Pistol||Manufacturer: Drake & Co Firearms|Primary: .45 Fire|Secondary: Flashlight||A brand new precision handgun designed by Drake & Co firearms, the Redstrom .45 is to be the military version of the current 10mm RS8. Dubbed the RS04, this unique and accurate pistol is still in its prototype stages. The .45 HV rounds used in the RS04 prototype allow for much improved stopping power at the expense of clip capacity and recoil. Current features include a tactical flashlight and a quick loading double shot firemode. Currently undergoing combat testing by private military contractors, the 8-round Redstrom is seen frequently in the battlefields of corporate warfare. The RS04 .45 Compact model is the latest variant."
+		Description="SX-45K Tech Pistol||Manufacturer: Drake & Co Firearms|Primary: .45 Fire|Secondary: Flashlight||A brand new precision handgun designed by Drake & Co firearms, the Redstrom .45 is to be the military version of the current 10mm RS8. Dubbed the RS04, this unique and accurate pistol is still in its prototype stages. The .45 HV rounds used in the RS04 prototype allow for much improved stopping power at the expense of clip capacity and recoil. Current features include a tactical flashlight and a quick loading double shot firemode. Currently undergoing combat testing by private military contractors, the 8-round Redstrom is seen frequently in the battlefields of corporate warfare. The RS04 .45 Compact model is the latest variant."
 		DrawScale=0.350000
 		FireModeClass(0)=Class'BWBP_SKC_Fix.SX45PrimaryFire'
 		FireModeClass(1)=Class'BWBP_SKC_Fix.SX45SecondaryFire'
@@ -632,7 +623,7 @@ defaultproperties
 		IconCoords=(X2=127,Y2=31)
 		IconMaterial=Texture'BWBP_SKC_Tex.M1911.SmallIcon_RS04'
 		InventoryGroup=2
-		ItemName="SX-45K Tactical Pistol"
+		ItemName="SX-45K Tech Pistol"
 		JumpChaos=0.250000
 		JumpOffSet=(Pitch=1000,Yaw=-500)
 		LightBrightness=130.000000
@@ -667,13 +658,14 @@ defaultproperties
 		ViewAimFactor=0.050000
 		ViewRecoilFactor=0.200000
      WeaponModes(0)=(ModeName="Semi-Auto")
-     WeaponModes(1)=(ModeName="Amplified: Cryogenic",ModeID="WM_FullAuto",bUnavailable=True)
-     WeaponModes(2)=(ModeName="Amplified: Radiation",ModeID="WM_FullAuto",bUnavailable=True)
+     WeaponModes(1)=(ModeName="Amplified: Cryogenic",ModeID="WM_SemiAuto",Value=1.000000,bUnavailable=True)
+     WeaponModes(2)=(ModeName="Amplified: Radiation",ModeID="WM_SemiAuto",Value=1.000000,bUnavailable=True)
      Skins(0)=Shader'BallisticWeapons2.Hands.Hands-Shiny'
      Skins(1)=Texture'BWBP_SKC_TexExp.SX45.SX45-Mag'
      Skins(2)=Shader'BWBP_SKC_TexExp.SX45.SX45-SightReticle_S'
      Skins(3)=Texture'BWBP_SKC_TexExp.SX45.SX45-Sight'
      Skins(4)=Texture'BWBP_SKC_TexExp.SX45.SX45-Main'
      Skins(5)=Texture'BWBP_SKC_TexExp.SX45.SX45-Laser'
-     Skins(6)=Shader'BWBP_SKC_TexExp.Amp.Amp-FinalRed'
+     Skins(6)=Shader'BWBP_SKC_TexExp.Amp.Amp-FinalCyan'
+	 Skins(7)=Shader'BWBP_SKC_TexExp.Amp.Amp-GlowCyanShader'
 }

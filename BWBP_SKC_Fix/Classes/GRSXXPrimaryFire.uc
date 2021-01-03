@@ -1,9 +1,9 @@
 //=============================================================================
 // GRSXXPrimaryFire.
 //
-// Med power, med range, low recoil pistol fire
+// high power, low range, low recoil pistol fire
 //
-// by Nolan "Dark Carnivour" Richert.
+// by Sarge and Nolan "Dark Carnivour" Richert.
 // Copyright(c) 2007 RuneStorm. All Rights Reserved.
 //=============================================================================
 class GRSXXPrimaryFire extends BallisticInstantFire;
@@ -16,12 +16,14 @@ function PlayFiring()
 		BW.IdleAnim = 'OpenIdle';
 		BW.ReloadAnim = 'OpenReload';
 		FireAnim = 'OpenFire';
+		AimedFireAnim='SightFireOpen';
 	}
 	else
 	{
 		BW.IdleAnim = 'Idle';
 		BW.ReloadAnim = 'Reload';
 		FireAnim = 'Fire';
+		AimedFireAnim='SightFire';
 	}
 	super.PlayFiring();
 }
@@ -43,7 +45,8 @@ defaultproperties
      KickForce=8000
      PenetrateForce=600
      bPenetrate=True
-     MuzzleFlashClass=Class'BallisticFix.XK2FlashEmitter'
+	 AimedFireAnim="SightFire"
+     MuzzleFlashClass=Class'BWBP_SKC_Fix.GRSXXFlashEmitter'
 //     MuzzleFlashClass=Class'BWBP_SKC_Fix.PlasmaFlashEmitter'
      FlashScaleFactor=1.500000
      BrassClass=Class'BallisticFix.Brass_GRSNine'
@@ -53,7 +56,7 @@ defaultproperties
      FireChaos=0.008000
      XInaccuracy=2.000000
      YInaccuracy=2.000000
-     BallisticFireSound=(Sound=Sound'BWBP_SKC_Sounds.Glock_Gold.G-Glk-Fire',Volume=1.200000)
+     BallisticFireSound=(Sound=Sound'BWBP_SKC_Sounds.Glock_Gold.GRSXX-Fire',Volume=1.200000)
      bModeExclusive=False
      FireEndAnim=
      TweenTime=0.000000

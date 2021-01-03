@@ -1,10 +1,10 @@
 //=============================================================================
-// GRSXXLaserOnFX.
+// GRSXXLaserOnFXBlue.
 //
 // by Nolan "Dark Carnivour" Richert.
 // Copyright(c) 2007 RuneStorm. All Rights Reserved.
 //=============================================================================
-class GRSXXLaserOnFX extends BallisticEmitter
+class GRSXXLaserOnFXBlue extends BallisticEmitter
 	placeable;
 
 defaultproperties
@@ -14,8 +14,8 @@ defaultproperties
          FadeIn=True
          UniformSize=True
          ColorScale(0)=(Color=(B=255,A=255))
-         ColorScale(1)=(RelativeTime=1.000000,Color=(R=145,B=255,A=255))
-         ColorMultiplierRange=(Y=(Min=0.300000,Max=0.300000))
+         ColorScale(1)=(RelativeTime=1.000000,Color=(B=255,A=255))
+         ColorMultiplierRange=(X=(Min=0.000000,Max=0.000000),Y=(Min=0.300000,Max=0.300000))
          FadeOutStartTime=0.025000
          FadeInEndTime=0.006000
          CoordinateSystem=PTCS_Relative
@@ -33,8 +33,8 @@ defaultproperties
          FadeOut=True
          FadeIn=True
          ColorScale(0)=(Color=(B=255,A=255))
-         ColorScale(1)=(RelativeTime=1.000000,Color=(R=145,B=255,A=255))
-         ColorMultiplierRange=(Y=(Min=0.300000,Max=0.300000))
+         ColorScale(1)=(RelativeTime=1.000000,Color=(B=255,A=255))
+         ColorMultiplierRange=(X=(Min=0.000000,Max=0.000000),Y=(Min=0.300000,Max=0.300000))
          Opacity=0.460000
          FadeOutStartTime=0.147000
          FadeInEndTime=0.045000

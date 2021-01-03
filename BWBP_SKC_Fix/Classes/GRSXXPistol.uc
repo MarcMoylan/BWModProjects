@@ -422,14 +422,11 @@ simulated function BringUp(optional Weapon PrevWeapon)
 		SightFX = Spawn(class'GRSXXSightLEDs');
 		class'BallisticEmitter'.static.ScaleEmitter(Emitter(SightFX), DrawScale);
 
-//		class'BUtil'.static.InitMuzzleFlash (GlowFX, class'GRSXXAmbientFX', DrawScale, self, 'tip2');
-//		class'BUtil'.static.InitMuzzleFlash (SightFX, class'GRSXXSightLEDs', DrawScale, self, 'SightBone');
+
 		if ((IsSlave() && Othergun.Hand >= 0) || (!IsSlave() && Hand < 0))
 		{
 			GRSXXAmbientFX(GlowFX).InvertY();
 			GRSXXSightLEDs(SightFX).InvertY();
-//			GRSXXAmbientFX(GlowFX).InvertZ();
-//			GRSXXSightLEDs(SightFX).InvertZ();
 		}
 	}
 }
@@ -632,9 +629,9 @@ defaultproperties
      SightFXBone="SightBone"
      BCRepClass=Class'BallisticFix.BallisticReplicationInfo'
      SpecialInfo(0)=(Info="1200.0;65.0;4.0;150.0;2.0;2.0;1.0")
-     BringUpSound=(Sound=Sound'BallisticSounds2.XK2.XK2-Pullout')
+     BringUpSound=(Sound=Sound'BWBP_SKC_Sounds.Glock_Gold.GRSXX-Select')
      PutDownSound=(Sound=Sound'BallisticSounds2.XK2.XK2-Putaway')
-     MagAmmo=24
+     MagAmmo=45
      CockSound=(Sound=Sound'BWBP4-Sounds.Glock.Glk-Cock',Volume=0.600000)
      ReloadAnimRate=0.750000
      ClipHitSound=(Sound=Sound'BWBP4-Sounds.Glock.Glk-ClipHit',Volume=0.700000)
@@ -642,9 +639,9 @@ defaultproperties
      ClipInSound=(Sound=Sound'BWBP4-Sounds.Glock.Glk-ClipIn')
      ClipInFrame=0.650000
      bNeedCock=True
-     CurrentWeaponMode=0
-     SightPivot=(Pitch=768,Roll=-1024)
-     SightOffset=(X=-15.000000,Y=-0.550000,Z=10.100000)
+     CurrentWeaponMode=2
+//     SightPivot=(Pitch=768,Roll=-1024)
+     SightOffset=(X=-15.000000,Y=0.000000,Z=6.500000)
      SightDisplayFOV=40.000000
      CrosshairCfg=(Pic1=Texture'BallisticUI2.Crosshairs.M50Out',Pic2=Texture'BallisticUI2.Crosshairs.M806InA',USize2=256,VSize2=256,Color1=(B=12,G=108,R=157,A=163),Color2=(B=255),StartSize1=79,StartSize2=124)
      CrosshairInfo=(SpreadRatios=(Y1=0.800000,Y2=1.000000),MaxScale=6.000000)
@@ -691,10 +688,10 @@ defaultproperties
      LightSaturation=150
      LightBrightness=130.000000
      LightRadius=3.000000
-     Mesh=SkeletalMesh'BWBP4-Anims.Glock'
+     Mesh=SkeletalMesh'BWBP_SKC_Anim.GRSXX_FP'
      DrawScale=0.150000
-     Skins(0)=Shader'BallisticWeapons2.Hands.Hands-Shiny'
-     Skins(1)=Shader'BWBP_SKC_Tex.Glock_Gold.Glock_GoldShine'
+//     Skins(0)=Shader'BallisticWeapons2.Hands.Hands-Shiny'
+//     Skins(1)=Shader'BWBP_SKC_Tex.Glock_Gold.Glock_GoldShine'
      bFullVolume=True
      SoundVolume=255
      SoundRadius=256.000000

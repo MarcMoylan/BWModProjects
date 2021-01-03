@@ -18,9 +18,15 @@ var() class<Actor>				MuzzleFlashClassAmp1;
 var() Actor						MuzzleFlashAmp2;		
 var() class<Actor>				MuzzleFlashClassAmp2;	
 var() Name						AmpFlashBone;
-var() float						AmpFlashScaleFactor;
+var() float						Amp1FlashScaleFactor;
+var() float						Amp2FlashScaleFactor;
 
-
+simulated function bool AllowFire()
+{
+	if (level.TimeSeconds < SX45Pistol(Weapon).AmplifierSwitchTime)
+		return false;
+	return super.AllowFire();
+}
 
 // Effect related functions ------------------------------------------------
 // Spawn the muzzleflash actor
@@ -31,9 +37,9 @@ function InitEffects()
     if ((MuzzleFlashClass != None) && ((MuzzleFlash == None) || MuzzleFlash.bDeleteMe) )
 		class'BUtil'.static.InitMuzzleFlash (MuzzleFlash, MuzzleFlashClass, Weapon.DrawScale*FlashScaleFactor, weapon, FlashBone);
     if ((MuzzleFlashClassAmp1 != None) && ((MuzzleFlashAmp1 == None) || MuzzleFlashAmp1.bDeleteMe) )
-		class'BUtil'.static.InitMuzzleFlash (MuzzleFlashAmp1, MuzzleFlashClassAmp1, Weapon.DrawScale*FlashScaleFactor, weapon, FlashBone);
+		class'BUtil'.static.InitMuzzleFlash (MuzzleFlashAmp1, MuzzleFlashClassAmp1, Weapon.DrawScale*Amp1FlashScaleFactor, weapon, AmpFlashBone);
     if ((MuzzleFlashClassAmp2 != None) && ((MuzzleFlashAmp2 == None) || MuzzleFlashAmp2.bDeleteMe) )
-		class'BUtil'.static.InitMuzzleFlash (MuzzleFlashAmp2, MuzzleFlashClassAmp2, Weapon.DrawScale*AmpFlashScaleFactor, weapon, FlashBone);
+		class'BUtil'.static.InitMuzzleFlash (MuzzleFlashAmp2, MuzzleFlashClassAmp2, Weapon.DrawScale*Amp2FlashScaleFactor, weapon, AmpFlashBone);
 
 }
 
@@ -88,12 +94,12 @@ simulated function SwitchWeaponMode (byte NewMode)
 	else if (NewMode == 1) //Cryo Amp
 	{
 		BallisticFireSound.Sound=Amp1FireSound;
-		BallisticFireSound.Volume=1.900000;
+		BallisticFireSound.Volume=1.700000;
 		RecoilPerShot=512.000000;
-		Damage=30.000000;
-		DamageHead=90.000000;
-		DamageLimb=20.000000;
-		FireRate=0.235000;
+		Damage=70.000000;
+		DamageHead=100.000000;
+		DamageLimb=35.000000;
+		FireRate=0.400000;
 		MaxWalls=0;
 		FlashScaleFactor=1.100000;
 		bFlashAmp1=true;
@@ -107,12 +113,11 @@ simulated function SwitchWeaponMode (byte NewMode)
 		BallisticFireSound.Sound=Amp2FireSound;
 		BallisticFireSound.Volume=1.200000;
 		RecoilPerShot=128.000000;
-		Damage=15.000000;
-		DamageHead=60.000000;
-		DamageLimb=10.000000;
-		FireRate=0.122500;
+		Damage=70.000000;
+		DamageHead=100.000000;
+		DamageLimb=35.000000;
+		FireRate=0.500000;
 		MaxWalls=0;
-		FlashScaleFactor=0.400000;
 		bFlashAmp1=false;
 		bFlashAmp2=true;
 		SX45Attachment(Weapon.ThirdPersonActor).bAmp1=false;
@@ -160,17 +165,17 @@ function PlayFiring()
 	{
 		BW.IdleAnim = 'IdleOpen';
 		BW.ReloadAnim = 'ReloadOpen';
-		if (RS04Pistol(Weapon).bScopeView)
+		if (SX45Pistol(Weapon).bScopeView)
 		{
-			if (bFlashAmp1)
+			if (bFlashAmp1 || bFlashAmp2)
 				FireAnim = 'FireOpen';
 			else
-				FireAnim = 'FireSightsOpen';
+				FireAnim = 'SightFireOpen';
 		}
-		else if (bFlashAmp1)
-			FireAnim = 'FireDualOpen';
 		else
+		{
 			FireAnim = 'FireOpen';
+		}
 	}
 	else
 	{
@@ -178,15 +183,15 @@ function PlayFiring()
 		BW.ReloadAnim = 'Reload';
 		if (SX45Pistol(Weapon).bScopeView)
 		{
-			if (bFlashAmp1)
+			if (bFlashAmp1 || bFlashAmp2)
 				FireAnim = 'Fire';
 			else
-				FireAnim = 'FireSights';
+				FireAnim = 'SightFire';
 		}
-		else if (bFlashAmp1)
-			FireAnim = 'FireDual';
 		else
+		{
 			FireAnim = 'Fire';
+		}
 	}
 
 	BW.SafePlayAnim(FireAnim, FireAnimRate, TweenTime, ,"FIRE");
@@ -201,11 +206,12 @@ function PlayFiring()
 
 defaultproperties
 {
-     Amp1FireSound=SoundGroup'BWBP_SKC_SoundsExp.MP40.MP40-HotFire'
-     Amp2FireSound=SoundGroup'BWBP_SKC_SoundsExp.MP40.MP40-AcidFire'
+     Amp1FireSound=Sound'BWBP_SKC_SoundsExp.SX45.SX45-FrostFire'
+     Amp2FireSound=Sound'BWBP_SKC_SoundsExp.SX45.SX45-RadFire'
 
-	 AmpFlashBone="tip1"
-     AmpFlashScaleFactor=0.250000
+	 AmpFlashBone="tip2"
+     Amp1FlashScaleFactor=0.750000
+     Amp2FlashScaleFactor=6.000000
      TraceRange=(Max=5500.000000)
      WaterRangeFactor=0.600000
      MaxWallSize=32.000000
@@ -222,8 +228,8 @@ defaultproperties
      PenetrateForce=150
      bPenetrate=True
      MuzzleFlashClass=Class'BallisticFix.XK2FlashEmitter'
-     MuzzleFlashClassAmp1=Class'BallisticFix.M50FlashEmitter'
-     MuzzleFlashClassAmp2=Class'BallisticFix.A500FlashEmitter'
+     MuzzleFlashClassAmp1=Class'BWBP_SKC_Fix.SX45CryoFlash'
+     MuzzleFlashClassAmp2=Class'BWBP_SKC_Fix.SX45RadMuzzleFlash'
      BrassClass=Class'BallisticFix.Brass_Pistol'
      BrassBone="ejector"
      BrassOffset=(X=-25.000000,Y=0.000000)
@@ -232,7 +238,7 @@ defaultproperties
      XInaccuracy=11.500000
      YInaccuracy=11.500000
      SilencedFireSound=(Sound=Sound'BWBP_SKC_Sounds.M1911.M1911-FireSil',Volume=0.800000,Radius=24.000000,bAtten=True)
-     BallisticFireSound=(Sound=SoundGroup'BWBP_SKC_SoundsExp.SX45.SX45-Fire',Volume=1.200000)
+     BallisticFireSound=(Sound=SoundGroup'BWBP_SKC_SoundsExp.SX45.SX45-Fire',Volume=1.600000)
      bModeExclusive=False
      FireEndAnim=
      TweenTime=0.000000
