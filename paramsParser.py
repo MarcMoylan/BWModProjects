@@ -6,8 +6,8 @@ import string
 
 #parse arguments (CSV of paths, BW version (stock, fix, pro)
 parser = argparse.ArgumentParser()
-parser.add_argument('-csv', help='CSV File containing the paths of the .uc files to parameterize', required=True)
-parser.add_argument('-ver', type=int, help='BW version to parse from. 0: stock, 1: fix, 2: pro, 3: real, 4: test', default=0)
+parser.add_argument('--csv', help='CSV File containing the paths of the .uc files to parameterize', required=True)
+parser.add_argument('--ver', type=int, help='BW version to parse from. 0: stock, 1: fix, 2: pro, 3: real, 4: horde', default=0)
 parser.add_argument('--nodef', help='Exclude default values', action="store_true")
 parser.add_argument('--mult', help='Exclude default values', action="store_true")
 
@@ -23,12 +23,12 @@ masterOutput = ""
 #set default dicts
 defaultInstantDict = {
 	'TraceRange': '(Min=5000.000000,Max=5000.000000)',
-	'WaterTraceRange':'128f',
+	'WaterTraceRange':'128.0',
 	'DecayRange':'(Min=0f,Max=0f)',
-	'RangeAtten':'1f',
-	'Damage':'1',
-	'HeadMult':'1.25f',
-	'LimbMult':'0.7f',
+	'RangeAtten':'1.0',
+	'Damage':'0',
+	'HeadMult':'1.25',
+	'LimbMult':'0.7',
 	'DamageType':'None',
 	'DamageTypeHead':'None',
 	'DamageTypeArm':'None',
@@ -37,14 +37,14 @@ defaultInstantDict = {
 	'PenetrationEnergy':'0',
 	'PenetrateForce':'0',
 	'bPenetrate':'False',
-	'PDamageFactor':'0.75f',
-	'WallPDamageFactor':'0.95f',
+	'PDamageFactor':'0.75',
+	'WallPDamageFactor':'0.95',
 	'MomentumTransfer':'0',
-	'HookStopFactor':'0f',
-	'HookPullForce':'0f',
+	'HookStopFactor':'0.0',
+	'HookPullForce':'0.0',
 	'FireSpreadMode':'FSM_Rectangle',
 	'MuzzleFlashClass':'None',
-	'FlashScaleFactor':'1f',
+	'FlashScaleFactor':'1.0',
 	'FireSound':'(Volume=1.000000,Radius=512.000000,Pitch=1.000000,bNoOverride=True)',
 	'Recoil':'0',
 	'Chaos':'0',
@@ -53,7 +53,7 @@ defaultInstantDict = {
 	'SplashDamage':'False',
 	'RecommendSplashDamage':'False',
 	'BotRefireRate':'0.95',
-	'WarnTargetPct':'0f'
+	'WarnTargetPct':'0.0'
 }
 defaultProjectileDict = {
 	'ERadiusFallOffType':'RFO_Linear',
@@ -72,7 +72,7 @@ defaultProjectileDict = {
 	'DamageGainEndTime':'0',
 	'FireSpreadMode':'FSM_Rectangle',
 	'MuzzleFlashClass':'None',
-	'FlashScaleFactor':'1f',
+	'FlashScaleFactor':'1.0',
 	'FireSound':'(Volume=1.000000,Radius=512.000000,Pitch=1.000000,bNoOverride=True)',
 	'Recoil':'0',
 	'Chaos':'0',
@@ -81,73 +81,98 @@ defaultProjectileDict = {
 	'SplashDamage':'False',
 	'RecommendSplashDamage':'False',
 	'BotRefireRate':'0.95',
-	'WarnTargetPct':'0f'
+	'WarnTargetPct':'0.0'
 }
 defaultShotgunDict = {
 	'TracerChance':'0.500000',
 	'TraceRange':'(Min=500.000000,Max=2000.000000)',
+	'WaterTraceRange':'128.0',
+	'DecayRange':'(Min=0.0,Max=0.0)',
+	'RangeAtten':'1.0',
 	'TraceCount':'0',
 	'TracerClass':'None',
 	'ImpactManager':'None',
 	'bDoWaterSplash':'false',
 	'MaxHits':'0',
-	'HeadMult':'1.4f',
-	'LimbMult':'0.7f',
+	'Damage':'0',
+	'HeadMult':'1.4',
+	'LimbMult':'0.7',
+	'DamageType':'None',
+	'DamageTypeHead':'None',
+	'DamageTypeArm':'None',
 	'WallPenetrateForce':'0.000000',
+	'PenetrationEnergy':'0',
+	'PenetrateForce':'0',
 	'bPenetrate':'False',
+	'PDamageFactor':'0.75',
+	'WallPDamageFactor':'0.95',
+	'bPenetrate':'False',
+	'UseRunningDamage':'False',
+	'RunningSpeedThreshold':'300',
+	'HookStopFactor':'0.0',
+	'HookPullForce':'0.0',
 	'FireSpreadMode':'FSM_Scatter',
 	'ShotTypeString':'shots',
 	'MuzzleFlashClass':'None',
-	'FlashScaleFactor':'1f',
+	'FlashScaleFactor':'1.0',
 	'FireSound':'(Volume=1.000000,Radius=512.000000,Pitch=1.000000,bNoOverride=True)',
 	'Recoil':'0',
 	'Chaos':'0',
 	'PushbackForce':'0',
+	'MomentumTransfer':'0',
 	'Inaccuracy':'(X=0,Y=0)',
 	'SplashDamage':'False',
 	'RecommendSplashDamage':'False',
 	'BotRefireRate':'0.95',
-	'WarnTargetPct':'0f'
+	'WarnTargetPct':'0.0'
 }
 defaultMeleeDict = {
 	'TraceRange':'(Min=145.000000,Max=145.000000)',
+	'WaterTraceRange':'128.0',
+	'DecayRange':'(Min=0.0,Max=0.0)',
+	'RangeAtten':'1.0',
 	'Damage':'50.000000',
-	'HeadMult':'1f',
-	'LimbMult':'1f',
-	'RangeAtten':'1.0f',
-	'ChargeDamageBonusFactor':'1f',
-	'FlankDamageMult':'1.15f',
-	'BackDamageMult':'1.3f',
+	'HeadMult':'1.0',
+	'LimbMult':'1.0',
+	'DamageType':'None',
+	'DamageTypeHead':'None',
+	'DamageTypeArm':'None',
+	'ChargeDamageBonusFactor':'1.0',
+	'FlankDamageMult':'1.15',
+	'BackDamageMult':'1.3',
 	'PenetrationEnergy':'0',
 	'PDamageFactor':'0.500000',
 	'RunningSpeedThreshold':'1000.000000',
+	'HookStopFactor':'0.0',
+	'HookPullForce':'0.0',
 	'FireSpreadMode':'FSM_Rectangle',
 	'MuzzleFlashClass':'None',
-	'FlashScaleFactor':'1f',
+	'FlashScaleFactor':'1.0',
 	'FireSound':'(Volume=1.000000,Radius=512.000000,Pitch=1.000000,bNoOverride=True)',
 	'Recoil':'0',
 	'Chaos':'0',
 	'PushbackForce':'0',
+	'MomentumTransfer':'0',
 	'Inaccuracy':'(X=0,Y=0)',
 	'SplashDamage':'False',
 	'RecommendSplashDamage':'False',
 	'BotRefireRate':'0.95',
-	'WarnTargetPct':'0f'
+	'WarnTargetPct':'0.0'
 }
 defaultFireDataDict = {
 	'FireInterval':'0.5',
 	'AmmoPerFire':'1',
-	'PreFireTime':'0f',
+	'PreFireTime':'0.0',
 	'MaxHoldTime':'0',
 	'TargetState':'',
 	'ModeName':'',
 	'MaxFireCount':'0',
 	'BurstFireRateFactor':'0.66',
 	'bCockAfterFire':'False',
-	'PreFireAnim':'PreFire',
-	'FireAnim':'Fire',
-	'FireLoopAnim':'FireLoop',
-	'FireEndAnim':'FireEnd',
+	'PreFireAnim':'"PreFire"',
+	'FireAnim':'"Fire"',
+	'FireLoopAnim':'"FireLoop"',
+	'FireEndAnim':'"FireEnd"',
 	'AimedFireAnim':'',
 	'PreFireAnimRate':'1.0',
 	'FireAnimRate':'1.0',
@@ -157,7 +182,7 @@ defaultFireDataDict = {
 defaultFireEffectDict = {
 	'FireSpreadMode':'FSM_Rectangle',
 	'MuzzleFlashClass':'None',
-	'FlashScaleFactor':'1f',
+	'FlashScaleFactor':'1.0',
 	'FireSound':'(Volume=1.000000,Radius=512.000000,Pitch=1.000000,bNoOverride=True)',
 	'Recoil':'0',
 	'Chaos':'0',
@@ -166,7 +191,7 @@ defaultFireEffectDict = {
 	'SplashDamage':'False',
 	'RecommendSplashDamage':'False',
 	'BotRefireRate':'0.95',
-	'WarnTargetPct':'0f'
+	'WarnTargetPct':'0.0'
 }
 defaultRecoilDict = {
 	'XCurve': '(Points=(,(InVal=1.000000)))',
@@ -203,7 +228,10 @@ defaultWeaponDict = {
 	'SightMoveSpeedFactor': '0.900000',
 	'SightingTime': '0.350000',
 	'DisplaceDurationMult': '1.000000',
-	'MagAmmo': '30'
+	'MagAmmo': '30',
+	'SightOffset': '(X=0,Y=0,Z=0)',
+	'SightPivot':'(Pitch=0,Yaw=0,Roll=0)',
+	'ZoomType': 'ZT_Irons'
 }
 
 
@@ -214,6 +242,8 @@ def createOutputString(paramsDict, version):
 		gametypeString = 'Arena'
 	elif version == 3:
 		gametypeString = 'Realistic'
+	elif version == 4:
+		gametypeString = 'Horde'
 	else:
 		gametypeString = 'Test'
 	
@@ -256,7 +286,7 @@ def createOutputString(paramsDict, version):
 		FireParams(0)=FireParams\''''+gametypeString+'''PrimaryFireParams'
 		AltFireParams(0)=FireParams\''''+gametypeString+'''SecondaryFireParams'
 	End Object
-	Params(0)=WeaponParams\''''+gametypeString+'''Params\'\n'''
+	Params(0)=WeaponParams\''''+gametypeString+'''Params\'\n\n'''
 
 	return outputStringRecoil + "\n" + outputStringAim + "\n" + outputStringBasic
 
@@ -291,7 +321,6 @@ def createFiremodeOutputString(paramsDict, fireModeNum, version):
 	if firemodeType == 0: #Instant fire
 		effectString += '''
 		Begin Object Class=InstantEffectParams Name='''+gametypeString+firemodeNumberString+'''EffectParams'''
-		print("no defaults = " + str(noDefaults))
 		for property in defaultInstantDict:
 			if not noDefaults or defaultInstantDict.get(property) != paramsDict.get(property):
 				effectString += '\n\t\t\t' + property + '=' + str(paramsDict.get(property))
@@ -409,11 +438,14 @@ def setDefaultParams(version):
 		#basic params
 		paramsDict['MagAmmo'] = '30'
 		paramsDict['InventorySize'] = '35'
+		paramsDict['SightOffset'] = '(X=0,Y=0,Z=0)'
+		paramsDict['SightPivot'] = '(Pitch=0,Yaw=0,Roll=0)'
 		paramsDict['PlayerSpeedFactor'] = '1.000000'
 		paramsDict['PlayerJumpFactor'] = '1.000000'
 		paramsDict['DisplaceDurationMult'] = '1.000000'
 		paramsDict['SightingTime'] = '0.350000'
 		paramsDict['SightMoveSpeedFactor'] = '0.500000'
+		paramsDict['ZoomType'] = 'ZT_Irons'
 	elif version == 2:
 		#recoil params
 		paramsDict = defaultRecoilDict.copy()
@@ -430,31 +462,31 @@ def setDefaultFiremodeParams(firemodeType, version):
 		# fire effect params
 		paramsDict['FireSpreadMode'] = 'FSM_Rectangle'
 		paramsDict['MuzzleFlashClass'] = 'None'
-		paramsDict['FlashScaleFactor'] = '1f'
+		paramsDict['FlashScaleFactor'] = '1.0'
 		paramsDict['BallisticFireSound'] = '(Volume=1.000000,Radius=255.000000,Pitch=1.000000,bNoOverride=True)'
-		paramsDict['RecoilPerShot'] = '0f'
-		paramsDict['FireChaos'] = '0f'
+		paramsDict['RecoilPerShot'] = '0.0'
+		paramsDict['FireChaos'] = '-1.0'
 		paramsDict['PushbackForce'] = '0'
-		paramsDict['XInaccuracy'] = '0f'
-		paramsDict['YInaccuracy'] = '0f'
+		paramsDict['XInaccuracy'] = '0.0'
+		paramsDict['YInaccuracy'] = '0.0'
 		paramsDict['bSplashDamage'] = 'False'
 		paramsDict['bRecommendSplashDamage'] = 'False'
 		paramsDict['BotRefireRate'] = '0.95'
-		paramsDict['WarnTargetPct'] = '0f'
+		paramsDict['WarnTargetPct'] = '0.0'
 		# fire data params
 		paramsDict['FireRate'] = '0.5'
 		paramsDict['AmmoPerFire'] = '1'
-		paramsDict['PreFireTime'] = '0f'
+		paramsDict['PreFireTime'] = '0.0'
 		paramsDict['MaxHoldTime'] = '0'
 		paramsDict['TargetState'] = ''
 		paramsDict['ModeName'] = ''
 		paramsDict['MaxFireCount'] = '0'
 		paramsDict['BurstFireRateFactor'] = '1.00'
 		paramsDict['bCockAfterFire'] = 'False'
-		paramsDict['PreFireAnim'] = 'PreFire'
-		paramsDict['FireAnim'] = 'Fire'
-		paramsDict['FireLoopAnim'] = 'FireLoop'
-		paramsDict['FireEndAnim'] = 'FireEnd'
+		paramsDict['PreFireAnim'] = '"PreFire"'
+		paramsDict['FireAnim'] = '"Fire"'
+		paramsDict['FireLoopAnim'] = '"FireLoop"'
+		paramsDict['FireEndAnim'] = '"FireEnd"'
 		paramsDict['AimedFireAnim'] = ''
 		paramsDict['PreFireAnimRate'] = '1.0'
 		paramsDict['FireAnimRate'] = '1.0'
@@ -463,12 +495,12 @@ def setDefaultFiremodeParams(firemodeType, version):
 		if firemodeType == 0 or firemodeType == 2 or firemodeType == 3:
 			#instant fire params
 			paramsDict['TraceRange'] = '(Min=5000.000000,Max=5000.000000)'
-			paramsDict['WaterTraceRange'] = '5000f'
-			paramsDict['DecayRange'] = '(Min=0f,Max=0f)'
-			paramsDict['RangeAtten'] = '1f'
-			paramsDict['Damage'] = '1'
-			paramsDict['HeadMult'] = '2.0f'
-			paramsDict['LimbMult'] = '0.5f'
+			paramsDict['WaterTraceRange'] = '5000.0'
+			paramsDict['DecayRange'] = '(Min=0.0,Max=0.0)'
+			paramsDict['RangeAtten'] = '1.0'
+			paramsDict['Damage'] = '0'
+			paramsDict['HeadMult'] = '2.0.0'
+			paramsDict['LimbMult'] = '0.5.0'
 			paramsDict['DamageType'] = 'None'
 			paramsDict['DamageTypeHead'] = 'None'
 			paramsDict['DamageTypeArm'] = 'None'
@@ -477,11 +509,11 @@ def setDefaultFiremodeParams(firemodeType, version):
 			paramsDict['MaxWallSize'] = '0'
 			paramsDict['PenetrateForce'] = '0'
 			paramsDict['bPenetrate'] = 'False'
-			paramsDict['PDamageFactor'] = '0.6f'
-			paramsDict['WallPDamageFactor'] = '0.4f'
+			paramsDict['PDamageFactor'] = '0.6'
+			paramsDict['WallPDamageFactor'] = '0.4'
 			paramsDict['MomentumTransfer'] = '0'
-			paramsDict['HookStopFactor'] = '0f'
-			paramsDict['HookPullForce'] = '0f'
+			paramsDict['HookStopFactor'] = '0.0'
+			paramsDict['HookPullForce'] = '0.0'
 		if firemodeType == 1:
 			#projectile fire params
 			paramsDict['ERadiusFallOffType'] = 'RFO_Linear'
@@ -491,10 +523,12 @@ def setDefaultFiremodeParams(firemodeType, version):
 			paramsDict['MaxSpeed'] = '0.000000'
 			paramsDict['AccelSpeed'] = '0'
 			paramsDict['Damage'] = '0'
+			paramsDict['DamageHead'] = '0'
+			paramsDict['DamageLimb'] = '0'
 			paramsDict['DamageRadius'] = '0.000000'
 			paramsDict['MomentumTransfer'] = '0'
-			paramsDict['HeadMult'] = '1.500000'
-			paramsDict['LimbMult'] = '1.500000'
+			paramsDict['HeadMult'] = '2.000000'
+			paramsDict['LimbMult'] = '0.500000'
 			paramsDict['MaxDamageGainFactor'] = '0'
 			paramsDict['DamageGainStartTime'] = '0'
 			paramsDict['DamageGainEndTime'] = '0'
@@ -508,8 +542,8 @@ def setDefaultFiremodeParams(firemodeType, version):
 			paramsDict['ImpactManager'] = 'None'
 			paramsDict['bDoWaterSplash'] = 'false'
 			paramsDict['MaxHits'] = '0'
-			paramsDict['HeadMult'] = '1.8f'
-			paramsDict['LimbMult'] = '0.24f'
+			paramsDict['HeadMult'] = '1.8'
+			paramsDict['LimbMult'] = '0.24'
 			paramsDict['MaxWallSize'] = '16.000000'
 			paramsDict['MaxWalls'] = '2'
 			paramsDict['bPenetrate'] = 'False'
@@ -519,12 +553,12 @@ def setDefaultFiremodeParams(firemodeType, version):
 			#melee fire params
 			paramsDict['TraceRange'] = '(Min=128.000000,Max=128.000000)'
 			paramsDict['Damage'] = '50.000000'
-			paramsDict['HeadMult'] = '1f'
-			paramsDict['LimbMult'] = '1f'
-			paramsDict['RangeAtten'] = '1.0f'
-			paramsDict['ChargeDamageBonusFactor'] = '1f'
-			paramsDict['FlankDamageMult'] = '1.15f'
-			paramsDict['BackDamageMult'] = '1.3f'
+			paramsDict['HeadMult'] = '1.0'
+			paramsDict['LimbMult'] = '1.0'
+			paramsDict['RangeAtten'] = '1.0'
+			paramsDict['ChargeDamageBonusFactor'] = '1'
+			paramsDict['FlankDamageMult'] = '1.15'
+			paramsDict['BackDamageMult'] = '1.3'
 			paramsDict['MaxWallSize'] = '0.000000'
 			paramsDict['PDamageFactor'] = '0.500000'
 			paramsDict['RunningSpeedThreshold'] = '1000.000000'
@@ -548,43 +582,72 @@ def setDefaultFiremodeParams(firemodeType, version):
 	
 #convert variable format from stock/fix to pro
 def updateFiremodeVariableData(firemodeDict, firemodeType, version):
-	if firemodeType == 0 or firemodeType == 2 or firemodeType == 3:
-		#Damage
-		if version == 0:
-			damageString = str(firemodeDict.get("Damage"))
-			damageMin = damageString[damageString.find('Min=')+4:damageString.find(',')].strip()
-			damageMax = damageString[damageString.find('Max=')+4:damageString.find(')')].strip()
-			convertedDamage = (float(damageMin)+float(damageMax))//2
-			firemodeDict['Damage'] = convertedDamage
+	if version == 2:
+		firemodeDict['Recoil'] = firemodeDict.get("FireRecoil")
+		firemodeDict['Chaos'] = firemodeDict.get("FireChaos")
+		firemodeDict['FireInterval'] = firemodeDict.get("FireRate")
+		if 'Damage' in firemodeDict:
+			firemodeDict['Damage'] = int(float(firemodeDict.get("Damage")))		
+		return firemodeDict
+	
+	if not firemodeType == 4:
+		if firemodeType == 1 and version == 0: 
+			scanString="DamageRange"
+		else:
+			scanString="Damage"
 			
-			damageString = str(firemodeDict.get("DamageHead"))
+		#Damage
+		if 'Max=' in firemodeDict.get(scanString): #protect against incorrect version user input
+			damageString = str(firemodeDict.get(scanString))
 			damageMin = damageString[damageString.find('Min=')+4:damageString.find(',')].strip()
 			damageMax = damageString[damageString.find('Max=')+4:damageString.find(')')].strip()
-			convertedDamageHead = (float(damageMin)+float(damageMax))//2
-			headMultiplier = float(convertedDamageHead)/float(convertedDamage)
+			try:
+				convertedDamage = (float(damageMin)+float(damageMax))//2
+				firemodeDict['Damage'] = convertedDamage
+			except ValueError:
+				firemodeDict['Damage'] = 0
+			
+			damageString = str(firemodeDict.get(scanString+"Head"))
+			damageMin = damageString[damageString.find('Min=')+4:damageString.find(',')].strip()
+			damageMax = damageString[damageString.find('Max=')+4:damageString.find(')')].strip()
+			try:
+				convertedDamageHead = (float(damageMin)+float(damageMax))//2
+				headMultiplier = str(convertedDamageHead/convertedDamage)[:8]
+			except ValueError:
+				headMultiplier = 1.0
 			firemodeDict['HeadMult'] = headMultiplier
 			
-			damageString = str(firemodeDict.get("DamageLimb"))
+			damageString = str(firemodeDict.get(scanString+"Limb"))
 			damageMin = damageString[damageString.find('Min=')+4:damageString.find(',')].strip()
 			damageMax = damageString[damageString.find('Max=')+4:damageString.find(')')].strip()
-			convertedDamageLimb = (float(damageMin)+float(damageMax))//2
-			limbMultiplier = convertedDamageLimb/convertedDamage
+			try:
+				convertedDamageLimb = (float(damageMin)+float(damageMax))//2
+				limbMultiplier = str(convertedDamageLimb/convertedDamage)[:8]
+			except ValueError:
+				limbMultiplier = 1.0
 			firemodeDict['LimbMult'] = limbMultiplier
-		elif version == 1:
-			firemodeDict['HeadMult'] = float(firemodeDict.get("DamageHead"))/float(firemodeDict.get("Damage"))
-			firemodeDict['LimbMult'] = float(firemodeDict.get("DamageLimb"))/float(firemodeDict.get("Damage"))
-		
-		#watertracerange
-		traceRangeString = str(firemodeDict.get("TraceRange"))
-		traceRangeMax = traceRangeString[traceRangeString.find('Max=')+4:traceRangeString.find(')')].strip()
-		waterTraceRange = float(traceRangeMax)*float(firemodeDict.get("WaterRangeFactor"))
-		firemodeDict['WaterTraceRange'] = waterTraceRange
-		firemodeDict['PenetrationEnergy'] = firemodeDict.get("MaxWallSize")
+			
+		elif float(firemodeDict.get('Damage')) != 0:
+			firemodeDict['HeadMult'] = str(float(firemodeDict.get("DamageHead"))/float(firemodeDict.get('Damage')))[:8]
+			firemodeDict['LimbMult'] = str(float(firemodeDict.get("DamageLimb"))/float(firemodeDict.get('Damage')))[:8]
+			
+		if not firemodeType == 1:
+			#water and walls
+			traceRangeString = str(firemodeDict.get("TraceRange"))
+			traceRangeMax = traceRangeString[traceRangeString.find('Max=')+4:traceRangeString.find(')')].strip()
+			if firemodeDict.get("WaterRangeFactor") != None:
+				waterTraceRange = float(traceRangeMax)*float(firemodeDict.get("WaterRangeFactor"))
+				firemodeDict['WaterTraceRange'] = waterTraceRange
+			firemodeDict['PenetrationEnergy'] = firemodeDict.get("MaxWallSize")
 	
 	#basic ones
 	firemodeDict['Recoil'] = firemodeDict.get("RecoilPerShot")
 	firemodeDict['Chaos'] = firemodeDict.get("FireChaos")
-	firemodeDict['Inaccuracy'] = '''(X=''' + str(firemodeDict.get("XInaccuracy")) + ''',Y=''' + str(firemodeDict.get("YInaccuracy")) + ''')'''
+	try:
+		#firemodeDict['Inaccuracy'] = '''(X=''' + str(int(firemodeDict.get("XInaccuracy"))) + ''',Y=''' + str(int(firemodeDict.get("YInaccuracy"))) + ''')'''
+		firemodeDict['Inaccuracy'] = '(X={},Y={})'.format(int(float(firemodeDict.get("XInaccuracy"))),int(float(firemodeDict.get("YInaccuracy"))))
+	except ValueError:
+		firemodeDict['Inaccuracy'] = '(X=0,Y=0)'
 	firemodeDict['FireSound'] = firemodeDict.get("BallisticFireSound")
 	firemodeDict['SplashDamage'] = firemodeDict.get("bSplashDamage")
 	firemodeDict['RecommendSplashDamage'] = firemodeDict.get("bRecommendSplashDamage")
@@ -600,7 +663,7 @@ def updateVariableData(paramsDict, version):
 		chaosAimString = str(paramsDict.get("ChaosAimSpread"))
 		aimMax = aimString[aimString.find('Max=')+4:aimString.find(')')].strip()
 		chaosAimMax = chaosAimString[chaosAimString.find('Max=')+4:chaosAimString.find(')')].strip()
-		paramsDict['AimSpread']='(Min='+aimMax+',Max='+chaosAimMax+')'
+		paramsDict['AimSpread']='(Min={},Max={})'.format(int(float(aimMax)),int(float(chaosAimMax))) #dont judge me
 		
 		#basic ones
 		paramsDict['XCurve'] = paramsDict.get("RecoilXCurve")
@@ -617,13 +680,16 @@ def updateVariableData(paramsDict, version):
 		paramsDict['CrouchMultiplier'] = paramsDict.get("CrouchAimFactor")
 		paramsDict['ADSMultiplier'] = paramsDict.get("SightAimFactor")
 		paramsDict['ViewBindFactor2'] = paramsDict.get("ViewAimFactor") #dict's cant's store multiples
+		if 'bNoMeshInScope' in paramsDict and 'ZoomType' not in paramsDict and paramsDict.get("bNoMeshInScope") == True:
+			paramsDict['ZoomType'] = paramsDict.get("ZT_Smooth")
+			
 		
 	
 #check supertype, return supertype
 def extractFileFiremodeType(data):
-	if data.find('InstantFire') != -1:
+	if data.find('InstantFire') != -1 or data.find('RangeAttenFire') != -1:
 		firemodeType=0
-	elif data.find('ProjectileFire') != -1:
+	elif data.find('ProjectileFire') != -1 or data.find('GrenadeFire') != -1:
 		firemodeType=1
 	elif data.find('ShotgunFire') != -1:
 		firemodeType=2
@@ -634,7 +700,7 @@ def extractFileFiremodeType(data):
 	return firemodeType
 
 #get the params after defaultproperties, return as a dictionary
-def extractFileParams(data, paramsDict):
+def extractFileParams(data, paramsDict, filePath):
 	if data.find('defaultproperties') != -1:
 		defaultParams = data.split("defaultproperties")[1]
 		defaultParams = defaultParams[defaultParams.find('{')+1:defaultParams.find('}')]
@@ -647,7 +713,7 @@ def extractFileParams(data, paramsDict):
 		#         for x, y in (param.split('=')  
 		#         for param in dataString.split('\n'))) 
 	else:
-		print("File has no default properties")
+		print("File " + filePath + " has no default properties")
 
 	#print(paramsDict)
 	return paramsDict
@@ -664,11 +730,12 @@ def processProjectileFile(filePath, inputDict, version):
 			#initialize
 			data = file.read()
 			#pull file data
-			processedDict = processedDict | extractFileParams(data, inputDict)
+			processedDict = processedDict | extractFileParams(data, inputDict, filePath)
 			#convert data to pro
 			#processedDict = updateFiremodeVariableData(processedDict, firemodeType, version)
 	else:
 		print(filePath + ": Unable to find projectile class.")
+		return inputDict
 	return processedDict
 	
 #try and open the firemodes and grab the params
@@ -684,7 +751,7 @@ def processFiremodeFile(filePath, firemodeClassName, version):
 			firemodeType = extractFileFiremodeType(data)
 			defaultDict = setDefaultFiremodeParams(firemodeType, version)
 			#pull file data
-			processedDict = extractFileParams(data, defaultDict)
+			processedDict = extractFileParams(data, defaultDict, filePath)
 			processedDict['firemodeType'] = firemodeType
 			#pull projectile data if applicable
 			if firemodeType == 1:
@@ -701,18 +768,22 @@ def processBaseFile(filePath, version):
 	if os.path.exists(filePath):
 		with open(filePath) as file:
 			#initialize
+			print(filePath)
 			standardDict = setDefaultParams(version)
 			#update
-			processedDict = extractFileParams(file.read(), standardDict) 
+			processedDict = extractFileParams(file.read(), standardDict, filePath) 
 			#grab firemodes
-			firemodeOneDict = processFiremodeFile(filePath, processedDict["FireModeClass(0)"], version)
-			firemodeTwoDict = processFiremodeFile(filePath, processedDict["FireModeClass(1)"], version)
-			#convert
-			updateVariableData(processedDict, version)
-			#write
-			outputString += createFiremodeOutputString(firemodeOneDict, 0, version)
-			outputString += createFiremodeOutputString(firemodeTwoDict, 1, version)
-			outputString += createOutputString(processedDict, version)
+			if "FireModeClass(0)" and "FireModeClass(1)" in processedDict:
+				firemodeOneDict = processFiremodeFile(filePath, processedDict["FireModeClass(0)"], version)
+				firemodeTwoDict = processFiremodeFile(filePath, processedDict["FireModeClass(1)"], version)
+				#convert
+				updateVariableData(processedDict, version)
+				#write
+				outputString += createFiremodeOutputString(firemodeOneDict, 0, version)
+				outputString += createFiremodeOutputString(firemodeTwoDict, 1, version)
+				outputString += createOutputString(processedDict, version)
+			else: 
+				return "//Data Process Failure\n"
 			return outputString
 	else:
 		print(filePath + " is not a valid path.")
@@ -743,16 +814,3 @@ if createMultFiles:
 else:
 	f = open("parserOutput.uc", "w")
 	f.write(parseCSVFile(csvFile, version))
-
-
-
-
-#split on new line to get substrings? Pull out substring before first = as param name
-#for each string in set of desired string
-#store values of wanted strings
-#depending on ver, change or add dict type
-#def translateParams
-
-# build an export string with the templates and data
-#export into a textfile
-
