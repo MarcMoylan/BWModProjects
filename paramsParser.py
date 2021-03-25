@@ -18,6 +18,7 @@ csvFile = args['csv']
 version = args['ver']
 noDefaults = args['nodef']
 createMultFiles = args['mult']
+gametypeString = ""
 masterOutput = ""
 
 #set default dicts
@@ -42,7 +43,7 @@ defaultInstantDict = {
 	'MomentumTransfer':'0',
 	'HookStopFactor':'0.0',
 	'HookPullForce':'0.0',
-	'SpreadMode':'FSM_Rectangle',
+	'SpreadMode':'FSM_Circle',
 	'MuzzleFlashClass':'None',
 	'FlashScaleFactor':'1.0',
 	'FireSound':'(Volume=1.000000,Radius=512.000000,Pitch=1.000000,bNoOverride=True)',
@@ -70,7 +71,7 @@ defaultProjectileDict = {
 	'MaxDamageGainFactor':'0',
 	'DamageGainStartTime':'0',
 	'DamageGainEndTime':'0',
-	'SpreadMode':'FSM_Rectangle',
+	'SpreadMode':'FSM_Circle',
 	'MuzzleFlashClass':'None',
 	'FlashScaleFactor':'1.0',
 	'FireSound':'(Volume=1.000000,Radius=512.000000,Pitch=1.000000,bNoOverride=True)',
@@ -144,7 +145,7 @@ defaultMeleeDict = {
 	'RunningSpeedThreshold':'1000.000000',
 	'HookStopFactor':'0.0',
 	'HookPullForce':'0.0',
-	'SpreadMode':'FSM_Rectangle',
+	'SpreadMode':'FSM_Circle',
 	'MuzzleFlashClass':'None',
 	'FlashScaleFactor':'1.0',
 	'FireSound':'(Volume=1.000000,Radius=512.000000,Pitch=1.000000,bNoOverride=True)',
@@ -235,17 +236,7 @@ defaultWeaponDict = {
 }
 
 
-def createOutputString(paramsDict, version):
-	if version == 0 or version == 1:
-		gametypeString = 'Classic'
-	elif version == 2:
-		gametypeString = 'Arena'
-	elif version == 3:
-		gametypeString = 'Realistic'
-	elif version == 4:
-		gametypeString = 'Horde'
-	else:
-		gametypeString = 'Test'
+def createOutputString(paramsDict):
 	
 	outputStringRecoil = '''
 	//=================================================================
@@ -265,10 +256,13 @@ def createOutputString(paramsDict, version):
 	//=================================================================
 
 	Begin Object Class=AimParams Name='''+gametypeString+'''AimParams'''
-	paramsDict['ViewBindFactor'] = paramsDict.get('ViewBindFactor2') #duplicate workaround
+	if 'ViewBindFactor2' in paramsDict:
+		paramsDict['ViewBindFactor'] = paramsDict.get('ViewBindFactor2') #duplicate workaround
+	
 	for property in defaultAimDict:
 		if not noDefaults or defaultAimDict.get(property) != paramsDict.get(property):
 			outputStringAim += '\n\t\t' + property + '=' + str(paramsDict.get(property))
+	
 	outputStringAim +='\n\tEnd Object'
 
 	outputStringBasic = '''    
@@ -290,123 +284,114 @@ def createOutputString(paramsDict, version):
 
 	return outputStringRecoil + "\n" + outputStringAim + "\n" + outputStringBasic
 
-def createFiremodeOutputString(paramsDict, fireModeNum, version):
+def createFiremodeOutputString(paramsDict, fireModeNum):
 
-	gametypeString = ''
 	firemodeNumberString = ''
 	
 	if not paramsDict:
 		return ''
 	
 	firemodeType =  paramsDict.get("firemodeType")
-		
-	if version == 0 or version == 1:
-		gametypeString = 'Classic'
-	elif version == 2:
-		gametypeString = 'Arena'
-	elif version == 3:
-		gametypeString = 'Realistic'
-		
+	
 	if fireModeNum == 0:
 		firemodeNumberString = 'Primary'
 	else:
 		firemodeNumberString = 'Secondary'
 		
 	effectString = '''
-    //=================================================================
-    // '''+firemodeNumberString.upper()+''' FIRE
-    //=================================================================	
-	
+	//=================================================================
+	// '''+firemodeNumberString.upper()+''' FIRE
+	//=================================================================	
 	'''
 	if firemodeType == 0: #Instant fire
 		effectString += '''
-		Begin Object Class=InstantEffectParams Name='''+gametypeString+firemodeNumberString+'''EffectParams'''
+	Begin Object Class=InstantEffectParams Name='''+gametypeString+firemodeNumberString+'''EffectParams'''
 		for property in defaultInstantDict:
 			if not noDefaults or defaultInstantDict.get(property) != paramsDict.get(property):
 				effectString += '\n\t\t\t' + property + '=' + str(paramsDict.get(property))
 		effectString += '''
-		End Object
+	End Object
 
-		Begin Object Class=FireParams Name='''+gametypeString+firemodeNumberString+'''FireParams'''
+	Begin Object Class=FireParams Name='''+gametypeString+firemodeNumberString+'''FireParams'''
 		for property in defaultFireDataDict:
 			if not noDefaults or defaultFireDataDict.get(property) != paramsDict.get(property):
 				effectString += '\n\t\t\t' + property + '=' + str(paramsDict.get(property))
 		effectString += '''	
-		FireEffectParams(0)=InstantEffectParams\''''+gametypeString+firemodeNumberString+'''EffectParams\'
-		End Object
+	FireEffectParams(0)=InstantEffectParams\''''+gametypeString+firemodeNumberString+'''EffectParams\'
+	End Object
 		'''
 	elif firemodeType == 1 or firemodeType == 4: #Projectile fire and grenade fire
 		effectString += '''
-		Begin Object Class=ProjectileEffectParams Name='''+gametypeString+firemodeNumberString+'''EffectParams'''
+	Begin Object Class=ProjectileEffectParams Name='''+gametypeString+firemodeNumberString+'''EffectParams'''
 		for property in defaultProjectileDict:
 			if not noDefaults or defaultProjectileDict.get(property) != paramsDict.get(property):
 				effectString += '\n\t\t\t' + property + '=' + str(paramsDict.get(property))
 		effectString += '''	
-		End Object
+	End Object
 
-		Begin Object Class=FireParams Name='''+gametypeString+firemodeNumberString+'''FireParams'''
+	Begin Object Class=FireParams Name='''+gametypeString+firemodeNumberString+'''FireParams'''
 		for property in defaultFireDataDict:
 			if not noDefaults or defaultFireDataDict.get(property) != paramsDict.get(property):
 				effectString += '\n\t\t\t' + property + '=' + str(paramsDict.get(property))
 		effectString += '''	
-		FireEffectParams(0)=ProjectileEffectParams\''''+gametypeString+firemodeNumberString+'''EffectParams\'
-		End Object
+	FireEffectParams(0)=ProjectileEffectParams\''''+gametypeString+firemodeNumberString+'''EffectParams\'
+	End Object
 		'''
 	elif firemodeType == 2: #Shotgun fire
 		effectString += '''
-		Begin Object Class=ShotgunEffectParams Name='''+gametypeString+firemodeNumberString+'''EffectParams'''
+	Begin Object Class=ShotgunEffectParams Name='''+gametypeString+firemodeNumberString+'''EffectParams'''
 		for property in defaultShotgunDict:
 			if not noDefaults or defaultShotgunDict.get(property) != paramsDict.get(property):
 				effectString += '\n\t\t\t' + property + '=' + str(paramsDict.get(property))
 		effectString += '''	
-		End Object
+	End Object
 
-		Begin Object Class=FireParams Name='''+gametypeString+firemodeNumberString+'''FireParams'''
+	Begin Object Class=FireParams Name='''+gametypeString+firemodeNumberString+'''FireParams'''
 		for property in defaultFireDataDict:
 			if not noDefaults or defaultFireDataDict.get(property) != paramsDict.get(property):
 				effectString += '\n\t\t\t' + property + '=' + str(paramsDict.get(property))
 		effectString += '''	
-			FireEffectParams(0)=ShotgunEffectParams\''''+gametypeString+firemodeNumberString+'''EffectParams\'
-		End Object
+	FireEffectParams(0)=ShotgunEffectParams\''''+gametypeString+firemodeNumberString+'''EffectParams\'
+	End Object
 		'''
 	elif firemodeType == 3: #Melee fire
 		effectString += '''
-		Begin Object Class=MeleeEffectParams Name='''+gametypeString+firemodeNumberString+'''EffectParams'''
+	Begin Object Class=MeleeEffectParams Name='''+gametypeString+firemodeNumberString+'''EffectParams'''
 		for property in defaultMeleeDict:
 			if not noDefaults or defaultMeleeDict.get(property) != paramsDict.get(property):
 				effectString += '\n\t\t\t' + property + '=' + str(paramsDict.get(property))
 		effectString += '''
-		End Object
+	End Object
 		
-		Begin Object Class=FireParams Name='''+gametypeString+firemodeNumberString+'''FireParams'''
+	Begin Object Class=FireParams Name='''+gametypeString+firemodeNumberString+'''FireParams'''
 		for property in defaultFireDataDict:
 			if not noDefaults or defaultFireDataDict.get(property) != paramsDict.get(property):
 				effectString += '\n\t\t\t' + property + '=' + str(paramsDict.get(property))
 		effectString += '''
-			FireEffectParams(0)=MeleeEffectParams\''''+gametypeString+firemodeNumberString+'''EffectParams\'
-		End Object
+	FireEffectParams(0)=MeleeEffectParams\''''+gametypeString+firemodeNumberString+'''EffectParams\'
+	End Object
 		'''
 	elif firemodeType == 5: #Other fire
 		effectString += '''
-		Begin Object Class=FireEffectParams Name='''+gametypeString+firemodeNumberString+'''EffectParams'''
+	Begin Object Class=FireEffectParams Name='''+gametypeString+firemodeNumberString+'''EffectParams'''
 		for property in defaultFireEffectDict:
 			if not noDefaults or defaultFireEffectDict.get(property) != paramsDict.get(property):
 				effectString += '\n\t\t\t' + property + '=' + str(paramsDict.get(property))
 		effectString += '''
-		End Object
+	End Object
 		
-		Begin Object Class=FireParams Name='''+gametypeString+firemodeNumberString+'''FireParams'''
+	Begin Object Class=FireParams Name='''+gametypeString+firemodeNumberString+'''FireParams'''
 		for property in defaultFireDataDict:
 			if not noDefaults or defaultFireDataDict.get(property) != paramsDict.get(property):
 				effectString += '\n\t\t\t' + property + '=' + str(paramsDict.get(property))
 		effectString += '''
-			FireEffectParams(0)=FireEffectParams\''''+gametypeString+firemodeNumberString+'''EffectParams\'
-		End Object
+	FireEffectParams(0)=FireEffectParams\''''+gametypeString+firemodeNumberString+'''EffectParams\'
+	End Object
 		'''
 	return effectString
 	
 	
-def setDefaultParams(version):
+def setDefaultParams():
 	paramsDict = {}
 	if version == 0 or version == 1:
 		#recoil params
@@ -456,7 +441,7 @@ def setDefaultParams(version):
 		paramsDict = paramsDict.copy() | defaultWeaponDict.copy()
 	return paramsDict
 
-def setDefaultFiremodeParams(firemodeType, version):
+def setDefaultFiremodeParams(firemodeType):
 	paramsDict = {}
 	#stock/fix
 	if version == 0 or version == 1:
@@ -534,6 +519,7 @@ def setDefaultFiremodeParams(firemodeType, version):
 			paramsDict['DamageGainStartTime'] = '0'
 			paramsDict['DamageGainEndTime'] = '0'
 			paramsDict['WarnTargetPct'] = '0.500000'
+		if firemodeType == 2:
 			#shotgun fire params
 			paramsDict['TracerChance'] = '0.500000'
 			paramsDict['TraceRange'] = '(Min=500.000000,Max=2000.000000)'
@@ -600,15 +586,29 @@ def setDefaultFiremodeParams(firemodeType, version):
 	return paramsDict
 	
 #convert variable format from stock/fix to pro
-def updateFiremodeVariableData(firemodeDict, firemodeType, version):
+def updateFiremodeVariableData(firemodeDict, firemodeType):
+	
+	#pro has its own sets of variables to convert
 	if version == 2:
-		firemodeDict['Recoil'] = firemodeDict.get("FireRecoil")
-		firemodeDict['Chaos'] = firemodeDict.get("FireChaos")
-		firemodeDict['FireInterval'] = firemodeDict.get("FireRate")
+		if "FireRecoil" in firemodeDict:
+			firemodeDict['Recoil'] = firemodeDict.get("FireRecoil")
+		if "FireChaos" in firemodeDict:
+			firemodeDict['Chaos'] = firemodeDict.get("FireChaos")
+		if "FireRate" in firemodeDict:
+			firemodeDict['FireInterval'] = firemodeDict.get("FireRate")
+		if 'FirePushbackForce' in firemodeDict:
+			firemodeDict['PushbackForce'] = firemodeDict.get("FirePushbackForce")
 		if 'Damage' in firemodeDict:
 			firemodeDict['Damage'] = int(float(firemodeDict.get("Damage")))		
+		if "BallisticFireSound" in firemodeDict:
+			firemodeDict['FireSound'] = firemodeDict.get("BallisticFireSound")
+		if "bSplashDamage" in firemodeDict:
+			firemodeDict['SplashDamage'] = firemodeDict.get("bSplashDamage")
+		if "bRecommendSplashDamage" in firemodeDict:
+			firemodeDict['RecommendSplashDamage'] = firemodeDict.get("bRecommendSplashDamage")
 		return firemodeDict
 	
+	#fix and stock variables convert here
 	if not firemodeType == 5: #convert damage and pen for regular fire types only
 		if "DamageRange" in firemodeDict: 
 			scanString="DamageRange"
@@ -666,22 +666,31 @@ def updateFiremodeVariableData(firemodeDict, firemodeType, version):
 			firemodeDict['PenetrationEnergy'] = firemodeDict.get("MaxWallSize")
 	
 	#basic ones
-	firemodeDict['Recoil'] = firemodeDict.get("RecoilPerShot")
-	firemodeDict['Chaos'] = firemodeDict.get("FireChaos")
+	if "RecoilPerShot" in firemodeDict:
+		firemodeDict['Recoil'] = firemodeDict.get("RecoilPerShot")
+	if "VelocityRecoil" in firemodeDict:
+		firemodeDict['PushbackForce'] = firemodeDict.get("VelocityRecoil")
+	if "FireChaos" in firemodeDict:
+		firemodeDict['Chaos'] = firemodeDict.get("FireChaos")
+	if "FireSpreadMode" in firemodeDict:
+		firemodeDict['SpreadMode'] = firemodeDict.get("FireSpreadMode")
+	if "BallisticFireSound" in firemodeDict:
+		firemodeDict['FireSound'] = firemodeDict.get("BallisticFireSound")
+	if "bSplashDamage" in firemodeDict:
+		firemodeDict['SplashDamage'] = firemodeDict.get("bSplashDamage")
+	if "bRecommendSplashDamage" in firemodeDict:
+		firemodeDict['RecommendSplashDamage'] = firemodeDict.get("bRecommendSplashDamage")
+	if "FireRate" in firemodeDict:
+		firemodeDict['FireInterval'] = firemodeDict.get("FireRate")
 	try:
-		#firemodeDict['Inaccuracy'] = '''(X=''' + str(int(firemodeDict.get("XInaccuracy"))) + ''',Y=''' + str(int(firemodeDict.get("YInaccuracy"))) + ''')'''
 		firemodeDict['Inaccuracy'] = '(X={},Y={})'.format(int(float(firemodeDict.get("XInaccuracy"))),int(float(firemodeDict.get("YInaccuracy"))))
 	except ValueError:
 		firemodeDict['Inaccuracy'] = '(X=0,Y=0)'
-	firemodeDict['FireSound'] = firemodeDict.get("BallisticFireSound")
-	firemodeDict['SplashDamage'] = firemodeDict.get("bSplashDamage")
-	firemodeDict['RecommendSplashDamage'] = firemodeDict.get("bRecommendSplashDamage")
-	firemodeDict['FireInterval'] = firemodeDict.get("FireRate")
 		
 	return firemodeDict
 		
 #convert variable format from stock/fix to pro
-def updateVariableData(paramsDict, version):
+def updateVariableData(paramsDict):
 	if version == 1 or version == 0:
 		#aimspread
 		aimString = str(paramsDict.get("AimSpread"))
@@ -704,15 +713,15 @@ def updateVariableData(paramsDict, version):
 		paramsDict['ADSViewBindFactor'] =paramsDict.get("ViewRecoilFactor")
 		paramsDict['CrouchMultiplier'] = paramsDict.get("CrouchAimFactor")
 		paramsDict['ADSMultiplier'] = paramsDict.get("SightAimFactor")
-		paramsDict['ViewBindFactor2'] = paramsDict.get("ViewAimFactor") #dict's cant's store multiples
 		if 'bNoMeshInScope' in paramsDict and 'ZoomType' not in paramsDict and paramsDict.get("bNoMeshInScope") == True:
 			paramsDict['ZoomType'] = paramsDict.get("ZT_Smooth")
-			
+	if "ViewAimFactor" in paramsDict:
+		paramsDict['ViewBindFactor2'] = paramsDict.get("ViewAimFactor") #dict's cant's store multiples
 		
 	
 #check supertype, return supertype
 def extractFileFiremodeType(data):
-	if data.find('InstantFire') != -1 or data.find('RangeAttenFire') != -1:
+	if data.find('InstantFire') != -1 or data.find('RangeAttenFire') != -1 or data.find('BallisticRailgunFire') != -1:
 		firemodeType=0
 	elif data.find('ProjectileFire') != -1:
 		firemodeType=1
@@ -746,12 +755,15 @@ def extractFileParams(data, paramsDict, filePath):
 	return paramsDict
 	
 #try and open the projectile file and grab the params
-def processProjectileFile(filePath, inputDict, version):
+def processProjectileFile(filePath, inputDict):
 	processedDict = {}
 	projectileClassName = inputDict['ProjectileClass']
 	#build file path
 	rootFilePath = filePath[:filePath.rfind('\\')]
-	filePath = rootFilePath + '\\' + projectileClassName[projectileClassName.find('.')+1:-1] + '.uc'
+	if projectileClassName.find('.') != -1:
+		filePath = rootFilePath + '\\' + projectileClassName[projectileClassName.find('.')+1:-1] + '.uc'
+	else:
+		filePath = rootFilePath + '\\' + projectileClassName[projectileClassName.find('\'')+1:-1] + '.uc'
 	if os.path.exists(filePath):
 		with open(filePath) as file:
 			#initialize
@@ -766,49 +778,52 @@ def processProjectileFile(filePath, inputDict, version):
 	return processedDict
 	
 #try and open the firemodes and grab the params
-def processFiremodeFile(filePath, firemodeClassName, version):
+def processFiremodeFile(filePath, firemodeClassName):
 	processedDict = {}
 	#build file path
 	rootFilePath = filePath[:filePath.rfind('\\')]
-	filePath = rootFilePath + '\\' + firemodeClassName[firemodeClassName.find('.')+1:-1] + '.uc'
+	if firemodeClassName.find('.') != -1:
+		filePath = rootFilePath + '\\' + firemodeClassName[firemodeClassName.find('.')+1:-1] + '.uc'
+	else:
+		filePath = rootFilePath + '\\' + firemodeClassName[firemodeClassName.find('\'')+1:-1] + '.uc'
 	if os.path.exists(filePath):
 		with open(filePath) as file:
 			#initialize
 			data = file.read()
 			firemodeType = extractFileFiremodeType(data)
-			defaultDict = setDefaultFiremodeParams(firemodeType, version)
+			defaultDict = setDefaultFiremodeParams(firemodeType)
 			#pull file data
 			processedDict = extractFileParams(data, defaultDict, filePath)
 			processedDict['firemodeType'] = firemodeType
 			#pull projectile data if applicable
 			if firemodeType == 1 or firemodeType == 4:
-				processedDict = processProjectileFile(filePath, processedDict, version)
+				processedDict = processProjectileFile(filePath, processedDict)
 			#convert data to pro
-			processedDict = updateFiremodeVariableData(processedDict, firemodeType, version)
+			processedDict = updateFiremodeVariableData(processedDict, firemodeType)
 	else:
 		print(filePath + ": Unable to find firemode class.")
 	return processedDict
 	
 #process the file, it's firemodes and return the params as a dict
-def processBaseFile(filePath, version):
+def processBaseFile(filePath):
 	outputString = ""
 	if os.path.exists(filePath):
 		with open(filePath) as file:
 			#initialize
 			print(filePath)
-			standardDict = setDefaultParams(version)
+			standardDict = setDefaultParams()
 			#update
 			processedDict = extractFileParams(file.read(), standardDict, filePath) 
 			#grab firemodes
 			if "FireModeClass(0)" and "FireModeClass(1)" in processedDict:
-				firemodeOneDict = processFiremodeFile(filePath, processedDict["FireModeClass(0)"], version)
-				firemodeTwoDict = processFiremodeFile(filePath, processedDict["FireModeClass(1)"], version)
+				firemodeOneDict = processFiremodeFile(filePath, processedDict["FireModeClass(0)"])
+				firemodeTwoDict = processFiremodeFile(filePath, processedDict["FireModeClass(1)"])
 				#convert
-				updateVariableData(processedDict, version)
+				updateVariableData(processedDict)
 				#write
-				outputString += createFiremodeOutputString(firemodeOneDict, 0, version)
-				outputString += createFiremodeOutputString(firemodeTwoDict, 1, version)
-				outputString += createOutputString(processedDict, version)
+				outputString += createFiremodeOutputString(firemodeOneDict, 0)
+				outputString += createFiremodeOutputString(firemodeTwoDict, 1)
+				outputString += createOutputString(processedDict)
 			else: 
 				return "//Data Process Failure\n"
 			return outputString
@@ -817,7 +832,7 @@ def processBaseFile(filePath, version):
 		return "//Data Process Failure\n"
 		
 #for each thing in CSV
-def parseCSVFile(csvFile, version):
+def parseCSVFile(csvFile):
 	outputData = ""
 	with open(csvFile) as file:
 		reader = csv.reader(file)
@@ -825,19 +840,30 @@ def parseCSVFile(csvFile, version):
 			if createMultFiles:
 				rowString = str(row)
 				rowStringMod = rowString[rowString.rfind('\\')+1:rowString.find('.')]
-				outputData = "class "+ rowStringMod +"WeaponParamsClassic extends BallisticWeaponParams;\n\ndefaultproperties\n{\n"
-				outputData += processBaseFile(row[0], version)
-				f = open(rowStringMod+"WeaponParamsClassic.uc", "w")
+				outputData = "class "+ rowStringMod +"WeaponParams"+gametypeString+" extends BallisticWeaponParams;\n\ndefaultproperties\n{\n"
+				outputData += processBaseFile(row[0])
+				f = open(rowStringMod+"WeaponParams"+gametypeString+".uc", "w")
 				f.write(outputData + "\n}")
 			else:
 				outputData += "//========================== "+ str(row)+" ==============\n//\n"
-				outputData += processBaseFile(row[0], version)
+				outputData += processBaseFile(row[0])
 
 	return outputData
 
 #MAIN METHOD
+if version == 0 or version == 1:
+	gametypeString = 'Classic'
+elif version == 2:
+	gametypeString = 'Arena'
+elif version == 3:
+	gametypeString = 'Realistic'
+elif version == 4:
+	gametypeString = 'Horde'
+else:
+	gametypeString = 'Test'
+
 if createMultFiles:
-	parseCSVFile(csvFile, version)
+	parseCSVFile(csvFile)
 else:
 	f = open("parserOutput.uc", "w")
-	f.write(parseCSVFile(csvFile, version))
+	f.write(parseCSVFile(csvFile))
